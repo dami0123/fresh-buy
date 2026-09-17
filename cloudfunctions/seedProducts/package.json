@@ -1,0 +1,9 @@
+{
+  "name": "seedProducts",
+  "version": "1.0.0",
+  "description": "FreshBuy 开发期商品造数云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,4 @@
+<!-- sub-seller/pages/ship/ship.wxml —— 发货拍照（空骨架，待同伴 B 填充） -->
+<view class="page">
+  <view class="placeholder">发货拍照 · 待实现</view>
+</view>

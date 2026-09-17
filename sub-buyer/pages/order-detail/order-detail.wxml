@@ -1,0 +1,4 @@
+<!-- sub-buyer/pages/order-detail/order-detail.wxml —— 订单详情（空骨架，待同伴 A 填充） -->
+<view class="page">
+  <view class="placeholder">订单详情 · 待实现</view>
+</view>

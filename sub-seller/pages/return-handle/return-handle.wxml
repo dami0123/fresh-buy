@@ -1,0 +1,4 @@
+<!-- sub-seller/pages/return-handle/return-handle.wxml —— 售后查看（空骨架，待同伴 B 填充；本页只读） -->
+<view class="page">
+  <view class="placeholder">售后处理 · 待实现</view>
+</view>

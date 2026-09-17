@@ -94,7 +94,7 @@ exports.main = async (event) => {
       userId: OPENID,
       items: orderItems,
       totalPrice,
-      status: 0, // 0:待支付 1:待发货 2:已完成
+      status: 1, // 1:待发货 2:待确认发货 3:配送中 4:已完成 5:售后中 6:已关闭
       createTime: now,
       updateTime: now
     }

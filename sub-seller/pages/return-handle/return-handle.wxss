@@ -1,0 +1,11 @@
+/* sub-seller/pages/return-handle/return-handle.wxss */
+.page {
+  padding: 24rpx;
+}
+
+.placeholder {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}

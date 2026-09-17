@@ -1,0 +1,4 @@
+<!-- sub-seller/pages/product-edit/product-edit.wxml —— 商品编辑（空骨架，待同伴 B 填充） -->
+<view class="page">
+  <view class="placeholder">商品编辑 · 待实现</view>
+</view>

@@ -17,25 +17,37 @@ const ROLE = {
   SELLER: 'seller'
 }
 
-/** 订单状态（orders.status） */
+/**
+ * 订单状态（orders.status）
+ * 状态机见 CLAUDE.md「订单状态机」：本项目无支付环节，status = 0 已废弃，永不写入。
+ */
 const ORDER_STATUS = {
-  PENDING_PAY: 0,   // 待支付
-  PENDING_SHIP: 1,  // 待发货
-  FINISHED: 2       // 已完成
+  PENDING_SHIP: 1,         // 待发货
+  PENDING_CONFIRM_SHIP: 2, // 待确认发货（商家已上传 3 张发货照片）
+  DELIVERING: 3,           // 配送中（买家已确认照片）
+  FINISHED: 4,             // 已完成
+  AFTER_SALE: 5,           // 售后中
+  CLOSED: 6                // 已关闭（退款终态）
 }
 
 /** 订单状态中文文案 */
 const ORDER_STATUS_TEXT = {
-  0: '待支付',
   1: '待发货',
-  2: '已完成'
+  2: '待确认发货',
+  3: '配送中',
+  4: '已完成',
+  5: '售后中',
+  6: '已关闭'
 }
 
 /** 订单状态对应的标签色（供页面样式绑定） */
 const ORDER_STATUS_THEME = {
-  0: 'warn',
   1: 'primary',
-  2: 'done'
+  2: 'warn',
+  3: 'primary',
+  4: 'done',
+  5: 'danger',
+  6: 'muted'
 }
 
 /** 双端首页路径，供身份路由跳转使用 */

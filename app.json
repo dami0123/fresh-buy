@@ -9,7 +9,11 @@
       "pages": [
         "pages/home/home",
         "pages/detail/detail",
-        "pages/cart/cart"
+        "pages/cart/cart",
+        "pages/order-confirm/order-confirm",
+        "pages/order-list/order-list",
+        "pages/order-detail/order-detail",
+        "pages/return-apply/return-apply"
       ]
     },
     {
@@ -18,7 +22,10 @@
       "pages": [
         "pages/dashboard/dashboard",
         "pages/product-manage/product-manage",
-        "pages/order-manage/order-manage"
+        "pages/order-manage/order-manage",
+        "pages/product-edit/product-edit",
+        "pages/ship/ship",
+        "pages/return-handle/return-handle"
       ]
     }
   ],

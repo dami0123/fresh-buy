@@ -13,8 +13,9 @@ Page({
     // 直接用 null 会退化成 where({ status: '' }) 而查不到数据
     tabs: [
       { status: -1, name: '全部' },
-      { status: ORDER_STATUS.PENDING_PAY, name: '待支付' },
       { status: ORDER_STATUS.PENDING_SHIP, name: '待发货' },
+      { status: ORDER_STATUS.PENDING_CONFIRM_SHIP, name: '待确认发货' },
+      { status: ORDER_STATUS.DELIVERING, name: '配送中' },
       { status: ORDER_STATUS.FINISHED, name: '已完成' }
     ],
     activeStatus: -1, // -1 表示不过滤状态
