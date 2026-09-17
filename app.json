@@ -1,0 +1,35 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "subPackages": [
+    {
+      "root": "sub-buyer",
+      "name": "buyer",
+      "pages": [
+        "pages/home/home",
+        "pages/detail/detail",
+        "pages/cart/cart"
+      ]
+    },
+    {
+      "root": "sub-seller",
+      "name": "seller",
+      "pages": [
+        "pages/dashboard/dashboard",
+        "pages/product-manage/product-manage",
+        "pages/order-manage/order-manage"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#07c160",
+    "navigationBarTitleText": "FreshBuy 生鲜",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f7f7"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

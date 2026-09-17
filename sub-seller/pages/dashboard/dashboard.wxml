@@ -1,0 +1,41 @@
+<!-- sub-seller/pages/dashboard/dashboard.wxml -->
+<view class="page">
+
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="empty" wx:if="{{error}}">{{error}}</view>
+
+  <!-- 核心指标 -->
+  <view class="stat-grid">
+    <view class="stat-card">
+      <view class="stat-value">{{stats.productTotal}}</view>
+      <view class="stat-label">商品总数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value">{{stats.orderTotal}}</view>
+      <view class="stat-label">订单总数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value warn">{{stats.pendingShipTotal}}</view>
+      <view class="stat-label">待发货</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value primary">{{stats.finishedTotal}}</view>
+      <view class="stat-label">已完成</view>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="card menu">
+    <view class="menu-item" data-url="/sub-seller/pages/product-manage/product-manage" bindtap="onNavTap">
+      <text>商品管理</text>
+      <text class="arrow">›</text>
+    </view>
+    <view class="menu-item" data-url="/sub-seller/pages/order-manage/order-manage" bindtap="onNavTap">
+      <text>订单管理</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <button class="btn btn-plain" bindtap="onLogout">切换身份</button>
+
+</view>

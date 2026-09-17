@@ -1,0 +1,32 @@
+<!-- sub-seller/pages/product-manage/product-manage.wxml -->
+<view class="page">
+
+  <view class="product-item card" wx:for="{{products}}" wx:key="_id">
+    <image class="cover" src="{{item.cover}}" mode="aspectFill" lazy-load />
+
+    <view class="main">
+      <view class="name">{{item.name}}</view>
+      <view class="meta">
+        <text class="price">¥{{item.priceText}}</text>
+        <text class="stock">库存 {{item.stock}}</text>
+        <text class="tag {{item.onSale ? 'tag-on' : 'tag-off'}}">{{item.onSale ? '已上架' : '已下架'}}</text>
+      </view>
+
+      <view class="ops">
+        <view class="op" data-id="{{item._id}}" bindtap="onEditStock">改库存</view>
+        <view class="op primary" data-id="{{item._id}}" bindtap="onToggleSale">
+          {{item.onSale ? '下架' : '上架'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态提示 -->
+  <view class="empty" wx:if="{{!loading && products.length === 0}}">{{error || '暂无商品'}}</view>
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="loading" wx:elif="{{!hasMore && products.length > 0}}">没有更多了</view>
+
+  <!-- 新增入口 -->
+  <view class="fab" bindtap="onCreate">＋</view>
+
+</view>

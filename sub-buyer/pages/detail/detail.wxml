@@ -1,0 +1,48 @@
+<!-- sub-buyer/pages/detail/detail.wxml -->
+<view class="page">
+
+  <view class="empty" wx:if="{{error}}">{{error}}</view>
+  <view class="loading" wx:elif="{{loading}}">加载中…</view>
+
+  <block wx:elif="{{product}}">
+    <!-- 商品图片轮播 -->
+    <swiper class="gallery" indicator-dots="{{product.images.length > 1}}" circular>
+      <swiper-item wx:for="{{product.images}}" wx:key="*this">
+        <image class="gallery-img" src="{{item}}" mode="aspectFill" />
+      </swiper-item>
+    </swiper>
+
+    <!-- 基本信息 -->
+    <view class="card info">
+      <view class="price-row">
+        <text class="price price-lg">¥{{product.priceText}}</text>
+        <text class="stock">库存 {{product.stock}}</text>
+      </view>
+      <view class="name">{{product.name}}</view>
+      <view class="category" wx:if="{{product.category}}">分类：{{product.category}}</view>
+    </view>
+
+    <!-- 数量选择 -->
+    <view class="card counter-row">
+      <text>购买数量</text>
+      <view class="counter">
+        <view class="counter-btn" bindtap="onMinus">−</view>
+        <view class="counter-value">{{count}}</view>
+        <view class="counter-btn" bindtap="onPlus">＋</view>
+      </view>
+    </view>
+
+    <!-- 底部操作栏 -->
+    <view class="footer">
+      <view class="footer-total">
+        合计 <text class="price">¥{{totalText}}</text>
+      </view>
+      <view class="footer-btns">
+        <button class="btn btn-plain" bindtap="onAddToCart">加入购物车</button>
+        <button class="btn btn-primary" bindtap="onBuyNow" disabled="{{submitting}}">立即购买</button>
+      </view>
+    </view>
+    <view class="footer-placeholder"></view>
+  </block>
+
+</view>

@@ -1,0 +1,44 @@
+<!-- sub-seller/pages/order-manage/order-manage.wxml -->
+<view class="page">
+
+  <!-- 状态筛选 -->
+  <view class="tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="name"
+      class="tab {{activeStatus === item.status ? 'active' : ''}}"
+      data-status="{{item.status}}"
+      bindtap="onTabTap"
+    >{{item.name}}</view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="card order" wx:for="{{orders}}" wx:key="_id">
+    <view class="order-head">
+      <text class="order-no">{{item.orderNo}}</text>
+      <text class="status status-{{item.statusTheme}}">{{item.statusText}}</text>
+    </view>
+
+    <view class="order-items">
+      <view class="order-item" wx:for="{{item.items}}" wx:for-item="goods" wx:key="productId">
+        <text class="goods-name">{{goods.name}}</text>
+        <text class="goods-count">×{{goods.count}}</text>
+      </view>
+    </view>
+
+    <view class="order-foot">
+      <text class="order-time">{{item.createTimeText}}</text>
+      <text class="order-total">共 {{item.count}} 件 合计 <text class="price">¥{{item.totalPriceText}}</text></text>
+    </view>
+
+    <view class="order-ops" wx:if="{{item.canShip}}">
+      <button class="btn btn-primary" data-id="{{item._id}}" bindtap="onShip" disabled="{{shipping}}">发货</button>
+    </view>
+  </view>
+
+  <!-- 状态提示 -->
+  <view class="empty" wx:if="{{!loading && orders.length === 0}}">{{error || '暂无订单'}}</view>
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="loading" wx:elif="{{!hasMore && orders.length > 0}}">没有更多了</view>
+
+</view>

@@ -1,0 +1,105 @@
+/* sub-buyer/pages/cart/cart.wxss */
+.page {
+  padding: 24rpx;
+}
+
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.go-btn {
+  width: 320rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  margin: 40rpx auto 0;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  background: #07c160;
+  color: #fff;
+}
+
+/* 条目 */
+.cart-item {
+  display: flex;
+}
+
+.cart-cover {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.cart-main {
+  flex: 1;
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-name {
+  font-size: 30rpx;
+  line-height: 1.4;
+}
+
+.cart-price {
+  margin-top: 8rpx;
+  font-size: 32rpx;
+}
+
+.cart-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.counter-text {
+  margin-right: 24rpx;
+}
+
+.subtotal {
+  flex: 1;
+  color: #666;
+}
+
+.remove {
+  color: #e64340;
+}
+
+/* 底部结算栏 */
+.bar-placeholder {
+  height: 140rpx;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120rpx;
+  padding: 0 24rpx calc(0px + env(safe-area-inset-bottom));
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.bar-total {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.btn {
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 56rpx;
+  border-radius: 38rpx;
+  font-size: 28rpx;
+  background: #07c160;
+  color: #fff;
+}

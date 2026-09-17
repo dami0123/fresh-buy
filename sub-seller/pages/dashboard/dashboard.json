@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "商家后台",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {}
+}

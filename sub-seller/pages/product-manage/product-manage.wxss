@@ -1,0 +1,98 @@
+/* sub-seller/pages/product-manage/product-manage.wxss */
+.page {
+  padding: 24rpx 24rpx 160rpx;
+}
+
+.product-item {
+  display: flex;
+}
+
+.cover {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.main {
+  flex: 1;
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 30rpx;
+  line-height: 1.4;
+}
+
+.meta {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.meta .price {
+  font-size: 30rpx;
+  margin-right: 20rpx;
+}
+
+.stock {
+  margin-right: 20rpx;
+}
+
+.tag {
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+
+.tag-on {
+  background: rgba(7, 193, 96, 0.1);
+  color: #07c160;
+}
+
+.tag-off {
+  background: #f2f2f2;
+  color: #999;
+}
+
+/* 操作按钮 */
+.ops {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.op {
+  padding: 10rpx 32rpx;
+  margin-left: 20rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.op.primary {
+  border-color: #07c160;
+  color: #07c160;
+}
+
+/* 新增按钮 */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 80rpx;
+  width: 100rpx;
+  height: 100rpx;
+  line-height: 96rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #07c160;
+  color: #fff;
+  font-size: 52rpx;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.4);
+}

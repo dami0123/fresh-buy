@@ -1,0 +1,39 @@
+<!-- sub-buyer/pages/cart/cart.wxml -->
+<view class="page">
+
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+
+  <view class="empty" wx:elif="{{error}}">{{error}}</view>
+
+  <!-- 空购物车 -->
+  <view class="empty" wx:elif="{{carts.length === 0}}">
+    <view class="empty-icon">🛒</view>
+    <view>购物车还是空的</view>
+    <button class="btn btn-primary go-btn" bindtap="onGoHome">去逛逛</button>
+  </view>
+
+  <!-- 购物车列表 -->
+  <block wx:else>
+    <view class="card cart-item" wx:for="{{carts}}" wx:key="_id">
+      <image class="cart-cover" src="{{item.image}}" mode="aspectFill" />
+      <view class="cart-main">
+        <view class="cart-name">{{item.name}}</view>
+        <view class="cart-price price">¥{{item.priceText}}</view>
+        <view class="cart-actions">
+          <text class="counter-text">×{{item.count}}</text>
+          <text class="subtotal">小计 ¥{{item.subtotalText}}</text>
+          <text class="remove" data-id="{{item._id}}" bindtap="onRemove">删除</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="bar-placeholder"></view>
+    <view class="bar">
+      <view class="bar-total">
+        共 {{totalCount}} 件，合计 <text class="price">¥{{totalText}}</text>
+      </view>
+      <button class="btn btn-primary" bindtap="onCheckout" disabled="{{submitting}}">结算</button>
+    </view>
+  </block>
+
+</view>

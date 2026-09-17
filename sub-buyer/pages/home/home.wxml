@@ -1,0 +1,45 @@
+<!-- sub-buyer/pages/home/home.wxml -->
+<view class="page">
+
+  <!-- 分类横向滚动 -->
+  <scroll-view class="category-bar" scroll-x enable-flex>
+    <view
+      wx:for="{{categories}}"
+      wx:key="id"
+      class="category-item {{activeCategory === item.id ? 'active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="onCategoryTap"
+    >{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 商品网格 -->
+  <view class="product-grid">
+    <view
+      wx:for="{{products}}"
+      wx:key="_id"
+      class="product-card"
+      data-id="{{item._id}}"
+      bindtap="onProductTap"
+    >
+      <image class="product-cover" src="{{item.cover}}" mode="aspectFill" lazy-load />
+      <view class="product-name">{{item.name}}</view>
+      <view class="product-bottom">
+        <text class="price">¥{{item.priceText}}</text>
+        <text class="stock">库存 {{item.stock}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态提示 -->
+  <view class="empty" wx:if="{{!loading && products.length === 0}}">
+    {{error || '暂无商品'}}
+  </view>
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="loading" wx:elif="{{!hasMore && products.length > 0}}">没有更多了</view>
+
+  <!-- 悬浮购物车入口 -->
+  <view class="cart-fab" bindtap="onCartTap">
+    <text class="cart-icon">🛒</text>
+  </view>
+
+</view>

@@ -1,0 +1,81 @@
+/* pages/index/index.wxss */
+.page {
+  min-height: 100vh;
+  padding: 0 64rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #07c160 0%, #06ad56 40%, #f7f7f7 40%, #f7f7f7 100%);
+}
+
+.brand {
+  margin-top: 120rpx;
+  margin-bottom: 160rpx;
+  text-align: center;
+  color: #fff;
+}
+
+.logo {
+  font-size: 120rpx;
+  line-height: 1;
+  margin-bottom: 32rpx;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: 600;
+  letter-spacing: 4rpx;
+}
+
+.subtitle {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  opacity: 0.85;
+}
+
+.actions {
+  width: 100%;
+}
+
+.hint {
+  text-align: center;
+  color: #666;
+  font-size: 26rpx;
+  margin-bottom: 32rpx;
+}
+
+.btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  margin-bottom: 24rpx;
+}
+
+.btn-primary {
+  background: #07c160;
+  color: #fff;
+}
+
+.btn-plain {
+  background: #fff;
+  color: #07c160;
+  border: 2rpx solid #07c160;
+}
+
+.error-box {
+  width: 100%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 40rpx 32rpx;
+}
+
+.error-text {
+  color: #e64340;
+  font-size: 26rpx;
+  line-height: 1.6;
+  margin-bottom: 32rpx;
+  text-align: center;
+}
