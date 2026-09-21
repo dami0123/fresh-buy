@@ -1,0 +1,9 @@
+{
+  "name": "removeCart",
+  "version": "1.0.0",
+  "description": "FreshBuy 删除购物车条目云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
