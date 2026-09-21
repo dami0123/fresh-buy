@@ -1,0 +1,9 @@
+{
+  "name": "aiJudge",
+  "version": "1.0.0",
+  "description": "FreshBuy 生鲜损坏责任判定云函数（一期 mock）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
