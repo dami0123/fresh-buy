@@ -36,4 +36,7 @@
     </view>
   </block>
 
+  <!-- 底部导航（自定义组件，见 sub-buyer/components/bottom-nav） -->
+  <bottom-nav current="cart" />
+
 </view>

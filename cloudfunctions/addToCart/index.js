@@ -6,13 +6,15 @@ const cloud = require('wx-server-sdk')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
+const db = cloud.database()
+
+// 单次加购上限，防止误操作与恶意刷量
+const MAX_COUNT = 99
 const CART_COLLECTION = 'cart'
 
-const db = cloud.database()
+// 集合对象必须在模块顶层声明后再使用，否则会在运行期抛 ReferenceError
 const products = db.collection('products')
 const carts = db.collection(CART_COLLECTION)
-
-const MAX_COUNT = 99 // 单次加购上限，防止误操作与恶意刷量
 
 // 云数据库不支持「写入时自动建表」，集合不存在时写入会直接抛错。
 // 开发期很容易踩这个坑（报错信息也不够直白），这里主动兜底建一次。
@@ -32,9 +34,10 @@ async function ensureCartCollection() {
 }
 
 exports.main = async (event) => {
+  const payload = event || {}
   const { OPENID } = cloud.getWXContext()
-  const { productId } = event
-  const count = Math.floor(Number(event.count))
+  const productId = payload.productId
+  const count = Math.floor(Number(payload.count))
 
   // ---- 参数校验 ----
   if (!productId) {
@@ -76,7 +79,14 @@ exports.main = async (event) => {
     const nextCount = currentCount + count
 
     if (nextCount > stock) {
-      return { code: -1, msg: `「${product.name}」库存不足，仅剩 ${stock} 件` }
+      // 报「还能再加几件」而不是「库存还剩几件」：购物车里已有的数量已占用库存，
+      // 只报库存总数会让用户以为还能加 stock 件，反复点击却始终失败。
+      const remaining = stock - currentCount
+      const msg = remaining <= 0
+        ? `「${product.name}」已达库存上限（${stock}件）  `
+        : `「${product.name}」库存不足，购物车已有 ${currentCount} 件，最多还能再加 ${remaining} 件`
+return { code: -1, msg }
+
     }
 
     const now = new Date()
@@ -108,9 +118,18 @@ exports.main = async (event) => {
       }
     })
 
-    return { code: 0, msg: '已加入购物车', cartId: addRes._id, count }
+    return { code: 0, msg: '已加入购物车', cartId: addRes._id, count: nextCount }
   } catch (err) {
-    console.error('[addToCart] 加入购物车失败', err)
-    return { code: -1, msg: '加入购物车失败，请确认 cart 集合已创建且权限配置正确' }
+    // 关键：必须把真实错误完整打进日志。返回给前端的 msg 是脱敏文案，
+    // 若排查时只盯着前端提示（例如「集合未创建」），会掩盖 ReferenceError 之类的真实原因。
+    console.error('[addToCart] 加入购物车失败', err && err.errCode, err && err.errMsg, err)
+
+    const notExist = !!(err && (err.errCode === -502005 ||
+      /collection not exists|DATABASE_COLLECTION_NOT_EXIST/i.test(String(err.errMsg || err.message || ''))))
+
+    return {
+      code: -1,
+      msg: notExist ? '购物车暂不可用（cart 集合未创建），请联系管理员' : '加入购物车失败，请稍后重试'
+    }
   }
 }

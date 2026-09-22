@@ -1,4 +1,157 @@
-<!-- sub-buyer/pages/order-detail/order-detail.wxml —— 订单详情（空骨架，待同伴 A 填充） -->
+<!-- sub-buyer/pages/order-detail/order-detail.wxml —— 订单详情 -->
 <view class="page">
-  <view class="placeholder">订单详情 · 待实现</view>
+
+  <view class="empty" wx:if="{{error}}">{{error}}</view>
+  <view class="loading" wx:elif="{{loading}}">加载中…</view>
+
+  <block wx:elif="{{order}}">
+
+    <!-- ==================== 状态 / 单号 / 时间 ==================== -->
+    <view class="card">
+      <view class="detail-status">
+        <text class="status status-{{order.statusTheme}}">{{order.statusText}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="label">订单编号</text>
+        <text selectable>{{order.orderNo}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="label">下单时间</text>
+        <text>{{order.createTimeText}}</text>
+      </view>
+    </view>
+
+    <!-- ==================== 售后未通过 ====================
+         判定为非商家责任时订单已自动回退到「已完成」，
+         必须把结论与理由展示出来，否则买家不知道售后已被系统驳回。 -->
+    <view class="card reject-banner" wx:if="{{order.showRejectBanner}}">
+      <view class="reject-title">售后未通过</view>
+      <view class="reject-text">
+        系统鉴别结论：{{order.rejectReason || '该损坏非商家发货时造成'}}。
+        订单已恢复为「已完成」，本结论为终局判定。
+      </view>
+    </view>
+
+    <!-- ==================== 收货地址（下单时的快照） ==================== -->
+    <view class="card">
+      <view class="card-title">收货地址</view>
+      <view class="addr-line">{{order.addressName}} {{order.addressPhone}}</view>
+      <view class="addr-text">{{order.addressText}}</view>
+    </view>
+
+    <!-- ==================== 商家发货照片 ==================== -->
+    <view class="card" wx:if="{{order.shipPhotos.length > 0}}">
+      <view class="card-title">商家发货照片</view>
+      <view class="photo-grid">
+        <image
+          class="photo"
+          wx:for="{{order.shipPhotos}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="aspectFill"
+          data-src="{{item}}"
+          bindtap="onPreview"
+        />
+      </view>
+      <view class="hint" wx:if="{{order.shipRejectReason}}">
+        上次驳回原因：{{order.shipRejectReason}}
+      </view>
+    </view>
+
+    <!-- ==================== 退货照片 ==================== -->
+    <view class="card" wx:if="{{order.returnPhotos.length > 0}}">
+      <view class="card-title">退货照片</view>
+      <view class="photo-grid">
+        <image
+          class="photo"
+          wx:for="{{order.returnPhotos}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="aspectFill"
+          data-src="{{item}}"
+          bindtap="onPreview"
+        />
+      </view>
+    </view>
+
+    <!-- ==================== 商品清单 ==================== -->
+    <view class="card">
+      <view class="card-title">商品清单</view>
+
+      <view
+        class="goods {{index === order.items.length - 1 ? 'last' : ''}}"
+        wx:for="{{order.items}}"
+        wx:for-item="goods"
+        wx:key="productId"
+      >
+        <image class="goods-cover" src="{{goods.image}}" mode="aspectFill" lazy-load />
+        <view class="goods-main">
+          <view class="goods-name">{{goods.name}}</view>
+          <view class="goods-meta">
+            <text class="price">¥{{goods.priceText}}</text>
+            <text class="goods-count">×{{goods.count}}</text>
+          </view>
+        </view>
+        <text class="goods-subtotal">¥{{goods.subtotalText}}</text>
+      </view>
+
+      <view class="detail-total">
+        共 {{order.totalCount}} 件，合计 <text class="price">¥{{order.totalText}}</text>
+      </view>
+    </view>
+
+    <view class="hint">本项目无支付环节，订单金额仅为记录值。</view>
+
+    <!-- ==================== 底部操作栏 ====================
+         按钮按状态动态出现，逻辑已在 js 的 decorateOrder 里算成布尔量。 -->
+    <view class="bar-placeholder"></view>
+    <view class="bar">
+      <view class="bar-total">
+        合计 <text class="price price-lg">¥{{order.totalText}}</text>
+      </view>
+
+      <!-- 2 待确认发货：驳回重拍 / 确认发货 -->
+      <button
+        class="btn btn-plain btn-sm"
+        wx:if="{{order.canConfirmShip}}"
+        bindtap="onRejectShip"
+        disabled="{{submitting}}"
+      >驳回重拍</button>
+      <button
+        class="btn btn-primary btn-sm"
+        wx:if="{{order.canConfirmShip}}"
+        bindtap="onConfirmShip"
+        disabled="{{submitting}}"
+      >确认发货</button>
+
+      <!-- 3 配送中：申请退货 / 确认收货 -->
+      <button
+        class="btn btn-plain btn-sm"
+        wx:if="{{order.canConfirmReceipt && order.canApplyReturn}}"
+        bindtap="onApplyReturn"
+      >申请退货</button>
+      <button
+        class="btn btn-primary btn-sm"
+        wx:if="{{order.canConfirmReceipt}}"
+        bindtap="onConfirmReceipt"
+        disabled="{{submitting}}"
+      >确认收货</button>
+
+      <!-- 4 已完成：仅申请退货（售后未通过后不再提供入口） -->
+      <button
+        class="btn btn-plain btn-sm"
+        wx:if="{{!order.canConfirmReceipt && order.canApplyReturn}}"
+        bindtap="onApplyReturn"
+      >申请退货</button>
+
+      <!-- 5 售后中：去处理（选退款或重发货） -->
+      <button
+        class="btn btn-primary btn-sm"
+        wx:if="{{order.isAfterSale}}"
+        bindtap="onHandleReturn"
+      >处理售后</button>
+    </view>
+
+  </block>
+
 </view>

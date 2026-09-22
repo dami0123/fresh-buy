@@ -13,7 +13,8 @@
         "pages/order-confirm/order-confirm",
         "pages/order-list/order-list",
         "pages/order-detail/order-detail",
-        "pages/return-apply/return-apply"
+        "pages/return-apply/return-apply",
+        "pages/profile/profile"
       ]
     },
     {

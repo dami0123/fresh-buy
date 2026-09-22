@@ -1,4 +1,60 @@
-<!-- sub-buyer/pages/return-apply/return-apply.wxml —— 申请售后（空骨架，待同伴 A 填充） -->
+<!-- sub-buyer/pages/return-apply/return-apply.wxml —— 申请售后（页面骨架） -->
 <view class="page">
-  <view class="placeholder">申请售后 · 待实现</view>
+
+  <!-- ==================== 退货原因 ==================== -->
+  <view class="card">
+    <view class="card-title">退货原因</view>
+
+    <view class="form-row form-row-top last">
+      <textarea
+        class="form-textarea"
+        value="{{reason}}"
+        maxlength="{{reasonMaxLen}}"
+        placeholder="请描述商品的问题，如：叶子发黄、有异味、到货即腐烂"
+        placeholder-class="is-placeholder"
+        bindinput="onReasonInput"
+      />
+    </view>
+    <view class="reason-counter">{{reason.length}}/{{reasonMaxLen}}</view>
+  </view>
+
+  <!-- ==================== 退货照片 ==================== -->
+  <view class="card">
+    <view class="card-title">
+      退货照片
+      <text class="card-title-note">（{{photos.length}}/{{maxPhotos}}，至少 1 张）</text>
+    </view>
+
+    <view class="photo-grid">
+      <view class="photo-item" wx:for="{{photos}}" wx:key="*this">
+        <image
+          class="photo"
+          src="{{item}}"
+          mode="aspectFill"
+          data-src="{{item}}"
+          bindtap="onPreview"
+        />
+        <view class="photo-remove" data-index="{{index}}" catchtap="onRemovePhoto">×</view>
+      </view>
+
+      <view class="photo-add" wx:if="{{photos.length < maxPhotos}}" bindtap="onChoosePhoto">
+        <text class="photo-add-icon">＋</text>
+      </view>
+    </view>
+
+    <view class="hint">照片将用于系统自动判责，请清晰拍摄损坏部位。</view>
+  </view>
+
+  <view class="hint">判责由系统自动完成，结论为终局判定，无人工申诉入口。</view>
+
+  <!-- ==================== 提交 ==================== -->
+  <view class="bar-placeholder"></view>
+  <view class="bar">
+    <button
+      class="btn btn-primary btn-block"
+      bindtap="onSubmit"
+      disabled="{{submitting}}"
+    >提交申请</button>
+  </view>
+
 </view>

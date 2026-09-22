@@ -1,0 +1,39 @@
+<!-- sub-buyer/pages/profile/profile.wxml —— 个人中心（基础骨架，业务逻辑待实现） -->
+<view class="page">
+
+  <!-- ==================== 用户信息 ==================== -->
+  <view class="card profile-head">
+    <view class="avatar">👤</view>
+    <view class="profile-info">
+      <view class="profile-name">{{displayName}}</view>
+      <view class="profile-phone">{{phone || '未设置手机号'}}</view>
+    </view>
+    <text class="status status-done" wx:if="{{roleText}}">{{roleText}}</text>
+  </view>
+
+  <!-- ==================== 功能入口 ==================== -->
+  <view class="card">
+    <view class="card-title">我的</view>
+
+    <view class="entry" bindtap="onAddressTap">
+      <text class="entry-label">收货地址</text>
+      <text class="entry-arrow">›</text>
+    </view>
+
+    <view class="entry" bindtap="onOrderEntryTap">
+      <text class="entry-label">我的订单</text>
+      <text class="entry-arrow">›</text>
+    </view>
+
+    <view class="entry entry-last">
+      <text class="entry-label">关于 FreshBuy</text>
+      <text class="entry-note">课程项目 · 无支付环节</text>
+    </view>
+  </view>
+
+  <view class="hint">个人中心为本次新增的基础骨架，内部业务逻辑尚未实现。</view>
+
+  <!-- 底部导航（自定义组件，见 sub-buyer/components/bottom-nav） -->
+  <bottom-nav current="profile" />
+
+</view>

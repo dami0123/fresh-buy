@@ -1,11 +1,65 @@
-/* sub-buyer/pages/order-list/order-list.wxss */
+/* sub-buyer/pages/order-list/order-list.wxss
+ * tab 栏、订单卡片、状态标签、商品行等通用样式全部来自买家端共享样式，
+ * 这里只写本页独有的部分（WXSS 的 @import 在编译期展开，作用域仍是本页）。 */
+@import "../../styles/common.wxss";
+
+/* .page 是 0 24rpx 40rpx，顶部不留内边距，好让 tab 栏吸顶贴住导航栏 */
 .page {
-  padding: 24rpx;
+  padding: 0 24rpx 40rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
+/* ==================== 状态 tab 栏 ====================
+ * .chip-bar / .chip 来自共享样式（首页分类栏与本页共用同一套原子件）。
+ * 这里只补齐横向滚动场景下需要的两点调整。 */
+.chip-bar {
+  /* .page 左右各有 24rpx 内边距，吸顶时列表内容会从这两条缝里透出来。
+     用负外边距把 tab 栏拉成通栏，再用内边距把标签推回正确位置。 */
+  margin: 0 -24rpx;
+  padding: 20rpx 24rpx;
+}
+
+/* ==================== 订单卡片 ==================== */
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f2f2f2;
+}
+
+.order-no {
+  font-size: 24rpx;
   color: #999;
-  font-size: 28rpx;
+}
+
+/* 商品行最后一条去掉分隔线，避免与 .order-foot 的上边框叠成两条 */
+.order .goods.last {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.order-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f2f2f2;
+}
+
+/* 时间与合计上下排，给右侧的「查看详情」按钮让出宽度 */
+.order-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.order-total {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #333;
 }

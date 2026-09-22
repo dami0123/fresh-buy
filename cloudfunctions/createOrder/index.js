@@ -12,6 +12,50 @@ const orders = db.collection('orders')
 
 const MAX_ITEM_KINDS = 20 // 单笔订单最多包含的商品种类（受 where _id in 查询上限约束）
 
+/**
+ * 收货地址必填字段（见 CLAUDE.md「收货地址约定」）。
+ * postalCode 不在其中：wx.chooseAddress 本就可能返回空串，缺失不算错。
+ */
+const ADDRESS_REQUIRED = ['name', 'phone', 'province', 'city', 'district', 'detail']
+
+/** 字段中文名，用于拼出「请补全××」这种能直接照着改的提示 */
+const ADDRESS_LABEL = {
+  name: '收货人',
+  phone: '手机号',
+  province: '省份',
+  city: '城市',
+  district: '区县',
+  detail: '详细地址'
+}
+
+/**
+ * 把前端传来的地址规整成订单快照。
+ *
+ * 为什么要白名单式重建而不是直接存 event.address：前端可被绕过，
+ * 传入的对象可能夹带 _id、_openid 等字段。逐字段取值能保证订单里
+ * 只有约定的 7 个字段，且类型统一为字符串。
+ *
+ * @return {{ok: boolean, msg: string, address: Object|null}}
+ */
+function normalizeAddress(input) {
+  if (!input || typeof input !== 'object') {
+    return { ok: false, msg: '缺少收货地址', address: null }
+  }
+
+  const address = {}
+  ADDRESS_REQUIRED.forEach((key) => {
+    address[key] = String(input[key] == null ? '' : input[key]).trim()
+  })
+  address.postalCode = String(input.postalCode == null ? '' : input.postalCode).trim()
+
+  const missing = ADDRESS_REQUIRED.find((key) => !address[key])
+  if (missing) {
+    return { ok: false, msg: `收货地址不完整，请补全${ADDRESS_LABEL[missing]}`, address: null }
+  }
+
+  return { ok: true, msg: '', address }
+}
+
 /** 生成订单号：年月日时分秒 + 4 位随机数 */
 function generateOrderNo() {
   const now = new Date()
@@ -30,7 +74,7 @@ function generateOrderNo() {
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-  const { items = [] } = event
+  const { items = [], address: rawAddress } = event
 
   // ---- 参数校验 ----
   if (!Array.isArray(items) || items.length === 0) {
@@ -39,6 +83,14 @@ exports.main = async (event) => {
   if (items.length > MAX_ITEM_KINDS) {
     return { code: -1, msg: `单笔订单最多支持 ${MAX_ITEM_KINDS} 种商品` }
   }
+
+  // 地址与商品同属下单的必要信息，必须一起校验。
+  // 前端下单页也校验一次，但那只为尽早给用户提示 —— 前端可被绕过，以这里的校验为准。
+  const addressCheck = normalizeAddress(rawAddress)
+  if (!addressCheck.ok) {
+    return { code: -1, msg: addressCheck.msg }
+  }
+  const address = addressCheck.address
 
   try {
     // ---- 拉取涉及的商品，以数据库中的数据为准 ----
@@ -95,6 +147,9 @@ exports.main = async (event) => {
       items: orderItems,
       totalPrice,
       status: 1, // 1:待发货 2:待确认发货 3:配送中 4:已完成 5:售后中 6:已关闭
+      // 地址快照：这里存的是下单时复制过来的内容副本，不是 users.address 的引用。
+      // 否则用户事后修改收货地址，历史订单的地址会跟着变（CLAUDE.md「地址快照原则」）。
+      address,
       createTime: now,
       updateTime: now
     }

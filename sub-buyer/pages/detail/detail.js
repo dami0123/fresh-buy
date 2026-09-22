@@ -76,44 +76,61 @@ Page({
    * （建议命名 addToCart / updateCartCount / removeCart），部署后再在此处调用：
    *   wx.cloud.callFunction({ name: 'addToCart', data: { productId, count } })
    */
-  onAddToCart() {
-    wx.showToast({
-      title: '待接入 addToCart 云函数',
-      icon: 'none'
+  addCart() {
+    wx.cloud.callFunction({
+      name: "addToCart",
+      data: {
+        productId: this.data.product._id,
+        count: this.data.count
+      },
+      success: res => {
+        wx.showToast({
+          title: "加入购物车成功"
+        })
+        console.log("addToCart返回", res)
+      },
+      fail: err => {
+        wx.showToast({
+          title: "加入购物车失败",
+          icon: "none"
+        })
+        console.error("调用云函数错误：", err)
+      }
     })
   },
 
-  /** 立即购买 —— 调用 createOrder 云函数下单（金额由服务端重新计算） */
+  /**
+   * 立即购买 —— 跳转到确认下单页
+   *                    ← 改动位置：原实现直接调 createOrder，现改为带商品信息跳转。
+   *
+   * 为什么不在这里直接调 createOrder：下单必须带收货地址快照，而地址表单在
+   * order-confirm 页。本页没有地址数据，也不该承担地址校验 —— 把商品信息交给
+   * order-confirm 后，由那一页统一收集地址、校验、并以快照形式传给 createOrder。
+   * 这样「购物车结算」与「立即购买」共用同一条下单链路，地址逻辑只有一份。
+   *
+   * mode=buyNow 告知下单页这是单品直购：只下单这一件，不读购物车，
+   * 也不把商品写进购物车（用户没主动加购，不该在他的购物车里留下条目）。
+   */
   onBuyNow() {
     if (this.data.submitting) return
 
     const { product, count } = this.data
     if (!product) return
 
+    // 借 submitting 兼作「跳转中」的防抖标记：连点两下会 push 出两个下单页，
+    // 返回时看到重复页面。WXML 上它同时驱动按钮的 disabled。
     this.setData({ submitting: true })
-    wx.showLoading({ title: '提交中…', mask: true })
 
-    wx.cloud.callFunction({
-      name: 'createOrder',
-      data: {
-        items: [{ productId: this.data.productId, count }]
-      },
-      success: (res) => {
-        const result = res.result || {}
-        if (result.code !== 0) {
-          wx.showToast({ title: result.msg || '下单失败', icon: 'none' })
-          return
-        }
-        wx.showToast({ title: '下单成功', icon: 'success' })
-        // 空壳阶段不接入支付，仅提示订单号；后续可跳转订单详情页
-        console.log('[FreshBuy] 订单已创建', result.orderNo)
-      },
+    wx.navigateTo({
+      url: '/sub-buyer/pages/order-confirm/order-confirm' +
+        `?mode=buyNow&productId=${encodeURIComponent(this.data.productId)}` +
+        `&count=${Math.max(1, Math.floor(Number(count) || 1))}`,
       fail: (err) => {
-        console.error('[FreshBuy] 创建订单失败', err)
-        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
+        console.error('[FreshBuy] 跳转确认下单页失败', err)
+        wx.showToast({ title: '页面跳转失败，请稍后重试', icon: 'none' })
       },
       complete: () => {
-        wx.hideLoading()
+        // 跳转结束后松开标记，用户从下单页返回时按钮恢复可用
         this.setData({ submitting: false })
       }
     })

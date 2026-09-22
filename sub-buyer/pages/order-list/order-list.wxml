@@ -1,4 +1,80 @@
-<!-- sub-buyer/pages/order-list/order-list.wxml —— 我的订单（空骨架，待同伴 A 填充） -->
+<!-- sub-buyer/pages/order-list/order-list.wxml —— 我的订单 -->
 <view class="page">
-  <view class="placeholder">我的订单 · 待实现</view>
+
+  <!-- ==================== 状态 tab 栏 ====================
+       用 scroll-view 而非普通 view：5 个标签在 750rpx 宽度下会溢出，
+       需要横向滚动（chip-bar 的 nowrap/flex 来自共享样式，滚动能力由这里给）。 -->
+  <scroll-view class="chip-bar" scroll-x enable-flex>
+    <view
+      wx:for="{{tabs}}"
+      wx:key="status"
+      class="chip {{activeStatus === item.status ? 'active' : ''}}"
+      data-status="{{item.status}}"
+      bindtap="onTabTap"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- ==================== 订单列表 ==================== -->
+  <block wx:if="{{orders.length > 0}}">
+    <view class="card order" wx:for="{{orders}}" wx:key="_id">
+
+      <!-- 头部：订单号 + 状态标签 -->
+      <view class="order-head">
+        <text class="order-no">订单号 {{item.orderNo}}</text>
+        <text class="status status-{{item.statusTheme}}">{{item.statusText}}</text>
+      </view>
+
+      <!-- 商品行：最后一条不画分隔线，否则会与 .order-foot 的上边框叠成两条 -->
+      <view
+        class="goods {{index === item.items.length - 1 ? 'last' : ''}}"
+        wx:for="{{item.items}}"
+        wx:for-item="goods"
+        wx:key="productId"
+      >
+        <image class="goods-cover" src="{{goods.image}}" mode="aspectFill" lazy-load />
+        <view class="goods-main">
+          <view class="goods-name">{{goods.name}}</view>
+          <view class="goods-meta">
+            <text class="price">¥{{goods.priceText}}</text>
+            <text class="goods-count">×{{goods.count}}</text>
+          </view>
+        </view>
+        <text class="goods-subtotal">¥{{goods.subtotalText}}</text>
+      </view>
+
+      <!-- 底部：下单时间 + 合计 + 查看详情 -->
+      <view class="order-foot">
+        <view class="order-meta">
+          <text class="order-time">{{item.createTimeText}}</text>
+          <text class="order-total">
+            共 {{item.totalCount}} 件，合计 <text class="price">¥{{item.totalText}}</text>
+          </text>
+        </view>
+        <button
+          class="btn btn-plain btn-sm"
+          data-id="{{item._id}}"
+          bindtap="onDetail"
+        >查看详情</button>
+      </view>
+
+    </view>
+
+    <view class="loading" wx:if="{{loadingMore}}">加载中…</view>
+    <view class="loading" wx:elif="{{!hasMore}}">没有更多了</view>
+  </block>
+
+  <!-- ==================== 空态 / 加载态 / 错误 ==================== -->
+  <view class="empty" wx:elif="{{loading}}">加载中…</view>
+
+  <view class="empty" wx:elif="{{error}}">{{error}}</view>
+
+  <view class="empty" wx:else>
+    <view class="empty-icon">📦</view>
+    <view>{{emptyText}}</view>
+    <button class="btn btn-primary go-btn" bindtap="onGoHome">去逛逛</button>
+  </view>
+
+  <!-- 底部导航（自定义组件，见 sub-buyer/components/bottom-nav） -->
+  <bottom-nav current="order" />
+
 </view>

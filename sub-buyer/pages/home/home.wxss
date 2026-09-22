@@ -70,10 +70,13 @@
 }
 
 /* 悬浮购物车按钮 */
+/* 抬到底部导航（高 100rpx）之上，否则会被导航条盖住。
+   TODO: 底部导航里已经有「购物车」入口，这个悬浮按钮已属重复，
+   确认交互后可以整体删掉（连同 home.wxml 的 .cart-fab 块）。 */
 .cart-fab {
   position: fixed;
   right: 40rpx;
-  bottom: 80rpx;
+  bottom: 180rpx;
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;

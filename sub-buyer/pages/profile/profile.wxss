@@ -1,0 +1,71 @@
+/* sub-buyer/pages/profile/profile.wxss
+ * 卡片、状态标签等通用样式来自买家端共享样式，与 order-list / order-detail 一致。 */
+@import "../../styles/common.wxss";
+
+/* .page 是 0 24rpx 40rpx，顶部不留内边距 */
+.page {
+  padding: 0 24rpx 40rpx;
+}
+
+/* ==================== 用户信息 ==================== */
+.profile-head {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 24rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #f2f2f2;
+  font-size: 56rpx;
+  line-height: 120rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  margin-left: 24rpx;
+  overflow: hidden;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-phone {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* ==================== 功能入口 ==================== */
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 2rpx solid #f7f7f7;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 最后一行不画分隔线 */
+.entry-last {
+  border-bottom: none;
+}
+
+.entry-arrow {
+  color: #ccc;
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.entry-note {
+  font-size: 24rpx;
+  color: #999;
+}

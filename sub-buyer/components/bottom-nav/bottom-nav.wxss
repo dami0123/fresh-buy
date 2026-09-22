@@ -1,0 +1,48 @@
+/* sub-buyer/components/bottom-nav/bottom-nav.wxss
+ * 类名统一加 bnav- 前缀，避免与页面样式（.bar / .item / .goods 等）撞名。
+ * 组件样式默认隔离，不会外泄到页面；这里也不需要引用 common.wxss。 */
+
+/* 高度与 .bnav 保持一致，把页面内容顶上去 */
+.bnav-placeholder {
+  height: 100rpx;
+}
+
+.bnav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100rpx;
+  /* 保留 calc(0px + …) 的写法：部分 Android WebView 解析不了裸 env()
+     （与 common.wxss 的 .bar 保持一致的写法） */
+  padding-bottom: calc(0px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 2rpx solid #f2f2f2;
+  display: flex;
+  /* 高于页面内的 .bar(10)，但两者已通过 bottom 错开，不会重叠 */
+  z-index: 20;
+}
+
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.bnav-item.is-active {
+  color: #07c160;
+}
+
+.bnav-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.bnav-text {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  line-height: 1;
+}

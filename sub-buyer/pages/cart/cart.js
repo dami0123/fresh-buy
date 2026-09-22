@@ -74,7 +74,14 @@ Page({
     wx.showToast({ title: '待接入 removeCart 云函数', icon: 'none' })
   },
 
-  /** 结算：把购物车条目提交给 createOrder 云函数（金额与库存由云函数二次校验） */
+  /**
+   * 结算：跳转到确认下单页。
+   *
+   * 为什么不在这里直接调 createOrder：下单必须先有收货地址快照，
+   * 而地址表单在 order-confirm 页。购物车既没有地址数据，也不该替下单页
+   * 承担地址校验（校验的唯一归属地是 order-confirm 的 validateAddress），
+   * 因此这里只负责把用户送到下单页，由那一页收集地址后调 createOrder。
+   */
   onCheckout() {
     if (this.data.submitting) return
     if (!this.data.carts.length) {
@@ -82,35 +89,7 @@ Page({
       return
     }
 
-    this.setData({ submitting: true })
-    wx.showLoading({ title: '提交中…', mask: true })
-
-    wx.cloud.callFunction({
-      name: 'createOrder',
-      data: {
-        items: this.data.carts.map((item) => ({
-          productId: item.productId,
-          count: item.count
-        }))
-      },
-      success: (res) => {
-        const result = res.result || {}
-        if (result.code !== 0) {
-          wx.showToast({ title: result.msg || '下单失败', icon: 'none' })
-          return
-        }
-        wx.showToast({ title: '下单成功', icon: 'success' })
-        // TODO: 下单成功后应清空已下单的购物车条目（需 removeCart 云函数）
-      },
-      fail: (err) => {
-        console.error('[FreshBuy] 结算失败', err)
-        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
-      },
-      complete: () => {
-        wx.hideLoading()
-        this.setData({ submitting: false })
-      }
-    })
+    wx.navigateTo({ url: '/sub-buyer/pages/order-confirm/order-confirm' })
   },
 
   /** 去逛逛 */

@@ -1,11 +1,48 @@
-/* sub-buyer/pages/order-detail/order-detail.wxss */
+/* sub-buyer/pages/order-detail/order-detail.wxss
+ * 卡片、商品行、照片网格、状态标签、底部操作栏等通用样式全部来自买家端共享样式，
+ * 与 order-list 用同一套原子件，保证两页视觉一致。
+ * 这里只写本页独有的部分（WXSS 的 @import 在编译期展开，作用域仍是本页）。 */
+@import "../../styles/common.wxss";
+
+/* .page 是 0 24rpx 40rpx，顶部不留内边距 */
 .page {
-  padding: 24rpx;
+  padding: 0 24rpx 40rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
+/* ==================== 状态 ==================== */
+.detail-status {
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f2f2f2;
+  margin-bottom: 8rpx;
+}
+
+/* ==================== 收货地址 ==================== */
+.addr-line {
+  padding-top: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.addr-text {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ==================== 商品清单 ==================== */
+/* 商品行最后一条去掉分隔线，避免与合计行叠成两条 */
+.goods.last {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-total {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f2f2f2;
+  text-align: right;
+  font-size: 26rpx;
+  color: #333;
 }

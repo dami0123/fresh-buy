@@ -1,11 +1,72 @@
-/* sub-buyer/pages/return-apply/return-apply.wxss */
+/* sub-buyer/pages/return-apply/return-apply.wxss
+ * 卡片、表单行、照片网格、底部操作栏等通用样式来自买家端共享样式，
+ * 与 order-confirm / order-detail 共用同一套原子件，保证视觉一致。
+ * 这里只写本页独有的部分（WXSS 的 @import 在编译期展开，作用域仍是本页）。 */
+@import "../../styles/common.wxss";
+
+/* .page 是 0 24rpx 40rpx，顶部不留内边距 */
 .page {
-  padding: 24rpx;
+  padding: 0 24rpx 40rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
+/* 卡片标题右侧的辅助说明（.card-title 本身是 flex + space-between） */
+.card-title-note {
+  font-size: 24rpx;
   color: #999;
-  font-size: 28rpx;
+  font-weight: normal;
+}
+
+/* 字数计数器 */
+.reason-counter {
+  margin-top: 8rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* ==================== 照片项 ====================
+ * .photo 本身（200x200、圆角、浅灰底）来自 common.wxss。
+ * 这里用一个相对定位的容器把它包起来，好让删除按钮能绝对定位到照片角上。 */
+.photo-item {
+  position: relative;
+  margin: 0 16rpx 16rpx 0;
+}
+
+/* 外层容器已负责间距，里面的 .photo 不再重复留 margin */
+.photo-item .photo {
+  margin: 0;
+  display: block;
+}
+
+.photo-remove {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 32rpx;
+  line-height: 44rpx;
+  text-align: center;
+}
+
+/* 添加按钮：与 .photo 同尺寸的虚线框 */
+.photo-add {
+  width: 200rpx;
+  height: 200rpx;
+  margin: 0 16rpx 16rpx 0;
+  border-radius: 12rpx;
+  border: 2rpx dashed #d9d9d9;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-add-icon {
+  font-size: 56rpx;
+  color: #bbb;
+  line-height: 1;
 }

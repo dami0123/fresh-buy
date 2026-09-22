@@ -1,0 +1,524 @@
+/* sub-buyer/styles/common.wxss —— 买家端共享样式
+ *
+ * 用法：买家端各页面的 .wxss 首行写
+ *   @import "../../styles/common.wxss";
+ * WXSS 的 @import 在编译期展开，作用域仍是各自的页面，不会外溢。
+ *
+ * 为什么放在这里而不是 app.wxss：app.wxss 是全局文件，同样作用于商家端分包
+ * （同伴 B 的目录），改它等于替对方改页面。放在 sub-buyer/styles/ 内，
+ * 作用域天然限制在买家端。
+ *
+ * 收录标准：**已被两个及以上页面各写了一份**的样式，或语义上应统一的原子件。
+ * 只有单个页面用的布局（如 home 的悬浮球）留在该页面自己的 .wxss 里。
+ *
+ * app.wxss 已提供的 .card / .empty / .loading / .price / .text-primary / .safe-bottom
+ * 继续复用，本文件不重复定义。
+ */
+
+/* ==================== 页面容器 ====================
+ * 统一为「左右 24rpx、底部留白」。顶部不留内边距，
+ * 好让首页分类栏、订单列表标签栏能贴住导航栏。 */
+.page {
+  padding: 0 24rpx 40rpx;
+}
+
+/* ==================== 卡片标题 ==================== */
+.card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f2f2f2;
+  margin-bottom: 8rpx;
+}
+
+/* 标题右侧操作区，可并排放多个 .link（如「粘贴地址」「微信地址」） */
+.card-title-ops {
+  display: flex;
+  align-items: center;
+}
+
+.card-title-ops .link + .link {
+  margin-left: 28rpx;
+}
+
+.link {
+  font-size: 26rpx;
+  font-weight: 400;
+  color: #07c160;
+}
+
+.card-divider {
+  height: 2rpx;
+  background: #f2f2f2;
+  margin: 20rpx 0;
+}
+
+/* ==================== 按钮 ====================
+ * 约定：.btn 只定尺寸与形状，**不定颜色**；颜色一律交给
+ * .btn-primary / .btn-plain / .btn-danger。
+ *
+ * 早先 order-confirm.wxss 把绿底直接写进了 .btn（而 WXML 上还挂着 btn-primary，
+ * 那个类根本没定义），detail.wxss 的 .btn 却只管尺寸 —— 同一个「主按钮」
+ * 在两处含义不同。这里统一掉，.btn 缺省是中性灰。 */
+.btn {
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 40rpx;
+  border-radius: 38rpx;
+  font-size: 28rpx;
+  margin: 0;
+  background: #f8f8f8;
+  color: #333;
+}
+
+/* 小程序 button 组件默认带 ::after 描边，有背景色时会露出深色一圈，去掉 */
+.btn::after {
+  border: none;
+}
+
+.btn-primary {
+  background: #07c160;
+  color: #fff;
+}
+
+.btn-plain {
+  background: #fff;
+  color: #07c160;
+  border: 2rpx solid #07c160;
+}
+
+.btn-danger {
+  background: #fff;
+  color: #e64340;
+  border: 2rpx solid #e64340;
+}
+
+/* 占满整行（原 order-detail 的 .btn.full、cart 的 .btn.block-btn 都用它） */
+.btn-block {
+  width: 100%;
+  margin: 0;
+}
+
+.btn-sm {
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 28rpx;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+}
+
+.btn[disabled] {
+  opacity: 0.5;
+}
+
+/* ==================== 底部固定操作栏 ==================== */
+.bar-placeholder {
+  height: 140rpx;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120rpx;
+  /* 保留 calc(0px + …) 的写法：部分 Android WebView 解析不了裸 env() */
+  padding: 0 24rpx calc(0px + env(safe-area-inset-bottom));
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+/* 左侧合计文案，占满剩余空间把按钮推到右边 */
+.bar-total {
+  flex: 1;
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 并排按钮之间的间距，省去每处手写 margin */
+.bar .btn + .btn {
+  margin-left: 20rpx;
+}
+
+/* ==================== 横向筛选条 ====================
+ * 首页的分类栏与订单列表的状态标签栏共用。
+ * 原先两处各写一份且取值略有出入（内边距 32/28rpx、间距 20/16rpx），统一到这里。
+ * 吸顶：文案滚动时从它下面穿过，所以必须有背景色。 */
+.chip-bar {
+  white-space: nowrap;
+  display: flex;
+  padding: 20rpx 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f7f7f7;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 12rpx 32rpx;
+  margin-right: 20rpx;
+  background: #fff;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.chip.active {
+  background: #07c160;
+  color: #fff;
+}
+
+/* 空态里的引导按钮（购物车「去逛逛」、订单列表「去逛逛」共用） */
+.go-btn {
+  width: 320rpx;
+  margin: 40rpx auto 0;
+}
+
+/* 空态大图标 */
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+/* ==================== 表单 ==================== */
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid #f7f7f7;
+}
+
+/* 最后一行不画分隔线 */
+.form-row:last-child,
+.form-row.last {
+  border-bottom: none;
+}
+
+/* 多行文本行：标签与内容顶部对齐更自然 */
+.form-row-top {
+  align-items: flex-start;
+}
+
+.form-label {
+  width: 150rpx;
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.form-input {
+  flex: 1;
+  min-height: 40rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.form-textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 88rpx;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+.form-picker {
+  flex: 1;
+  min-height: 40rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 未选择时的占位灰 */
+.is-placeholder {
+  color: #999;
+}
+
+.form-error {
+  padding-top: 10rpx;
+  font-size: 24rpx;
+  color: #e64340;
+}
+
+/* ==================== 商品清单 ==================== */
+.goods {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f7f7f7;
+}
+
+.goods:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.goods-cover {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.goods-main {
+  flex: 1;
+  margin-left: 20rpx;
+  overflow: hidden;
+}
+
+.goods-name {
+  font-size: 28rpx;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-meta {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: baseline;
+}
+
+.goods-count {
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.goods-subtotal {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* ==================== 数量计数器 ====================
+ * detail 原为 64rpx、cart 原为 56rpx，统一成 60rpx。 */
+.counter {
+  display: flex;
+  align-items: center;
+}
+
+.counter-btn {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 56rpx;
+  text-align: center;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.counter-value {
+  min-width: 80rpx;
+  text-align: center;
+  font-size: 30rpx;
+}
+
+/* ==================== 状态徽标 ====================
+ * 色值名与 utils/constant.js 的 ORDER_STATUS_THEME 一一对应
+ * （primary / warn / done / danger / muted），改常量时留意这里。 */
+.status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.status-primary {
+  background: rgba(7, 193, 96, 0.1);
+  color: #07c160;
+}
+
+.status-warn {
+  background: rgba(255, 151, 106, 0.12);
+  color: #ff976a;
+}
+
+.status-danger {
+  background: rgba(230, 67, 64, 0.1);
+  color: #e64340;
+}
+
+.status-done {
+  background: #f2f2f2;
+  color: #999;
+}
+
+.status-muted {
+  background: #f2f2f2;
+  color: #b2b2b2;
+}
+
+/* ==================== 售后判定 ====================
+ * 订单详情页与售后申请页共用。
+ * 判定由系统自动完成、商家不可改判（见 CLAUDE.md「售后判定约定」），
+ * 因此这里只有只读展示，没有可操作的控件。 */
+.judge-badge {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  margin-bottom: 16rpx;
+}
+
+.liable-yes {
+  background: rgba(230, 67, 64, 0.1);
+  color: #e64340;
+}
+
+.liable-no {
+  background: #f2f2f2;
+  color: #999;
+}
+
+.judge-reason {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+/* 售后未通过横幅：liable=false 时订单已自动回退到「已完成」，
+ * 必须让买家看到结论与理由，否则订单会卡在售后中无人能处理 */
+.reject-banner {
+  background: rgba(230, 67, 64, 0.06);
+}
+
+.reject-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #e64340;
+  margin-bottom: 12rpx;
+}
+
+.reject-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ==================== 照片网格 ==================== */
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8rpx;
+}
+
+.photo {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+  margin: 0 16rpx 16rpx 0;
+}
+
+/* ==================== 元信息行 ==================== */
+.meta-row {
+  display: flex;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.9;
+}
+
+.meta-row .label {
+  width: 150rpx;
+  color: #999;
+  flex-shrink: 0;
+}
+
+/* ==================== 文案 ==================== */
+.hint {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+.muted {
+  color: #999;
+}
+
+.price-lg {
+  font-size: 44rpx;
+}
+
+.stock {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 售罄：库存文案转红（首页商品卡与详情页共用） */
+.stock.is-sold-out-text {
+  color: #e64340;
+}
+
+/* ==================== 模态弹层 ==================== */
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog {
+  width: 600rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx 32rpx 24rpx;
+}
+
+.dialog-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.dialog-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.dialog-input {
+  width: 100%;
+  height: 180rpx;
+  padding: 20rpx;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.dialog-ops {
+  display: flex;
+  margin-top: 24rpx;
+}
+
+.dialog-btn {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  color: #666;
+}
+
+.dialog-btn.primary {
+  color: #07c160;
+  font-weight: 600;
+}

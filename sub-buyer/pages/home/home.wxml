@@ -42,4 +42,7 @@
     <text class="cart-icon">🛒</text>
   </view>
 
+  <!-- 底部导航（自定义组件，见 sub-buyer/components/bottom-nav） -->
+  <bottom-nav current="home" />
+
 </view>

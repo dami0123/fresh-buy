@@ -1,0 +1,17 @@
+<!-- sub-buyer/components/bottom-nav/bottom-nav.wxml —— 买家端自定义底部导航 -->
+<!-- 占位块在正常文档流里，负责把页面内容顶上去，避免被固定定位的导航条盖住。
+     有了它，各页面不需要再手动加 padding-bottom。 -->
+<view class="bnav-placeholder"></view>
+
+<view class="bnav">
+  <view
+    class="bnav-item {{item.key === current ? 'is-active' : ''}}"
+    wx:for="{{items}}"
+    wx:key="key"
+    data-key="{{item.key}}"
+    bindtap="onTap"
+  >
+    <text class="bnav-icon">{{item.icon}}</text>
+    <text class="bnav-text">{{item.text}}</text>
+  </view>
+</view>

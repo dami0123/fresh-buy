@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "个人中心",
+  "usingComponents": {
+    "bottom-nav": "/sub-buyer/components/bottom-nav/bottom-nav"
+  }
+}

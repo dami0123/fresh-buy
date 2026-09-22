@@ -71,17 +71,22 @@
 }
 
 /* 底部结算栏 */
+/* 垫高：140rpx 给自己的结算栏，另加 100rpx 给底部导航（组件内还有一块
+   同高的占位，两者叠加后内容不会被任何一条固定栏盖住） */
 .bar-placeholder {
-  height: 140rpx;
+  height: 240rpx;
 }
 
 .bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  /* 抬到底部导航（高 100rpx）之上，否则两条固定栏会叠在同一位置 */
+  bottom: 100rpx;
   height: 120rpx;
-  padding: 0 24rpx calc(0px + env(safe-area-inset-bottom));
+  /* 安全区已由底部导航预留，这里不再留（原为 calc(0px + env(safe-area-inset-bottom))），
+     否则两条栏之间会多出一段空白 */
+  padding: 0 24rpx;
   background: #fff;
   display: flex;
   align-items: center;

@@ -1,11 +1,19 @@
-/* sub-buyer/pages/order-confirm/order-confirm.wxss */
+/* sub-buyer/pages/order-confirm/order-confirm.wxss
+ * 表单 / 商品清单 / 底部操作栏等通用样式全部来自买家端共享样式，
+ * 这里只写本页独有的部分（WXSS 的 @import 在编译期展开，作用域仍是本页）。 */
+@import "../../styles/common.wxss";
+
+/* 本页顶部没有吸顶筛选条，补一点上边距，避免卡片贴住导航栏 */
 .page {
-  padding: 24rpx;
+  padding-top: 24rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
+/* 校验未通过的字段：标签转红，配合 showModal 让用户一眼定位到缺哪一项 */
+.form-row.is-error .form-label {
+  color: #e64340;
+}
+
+/* 「粘贴地址」与「微信地址」均为纯文本链接，需要可点区域足够大才好按 */
+.card-title-ops .link {
+  padding: 8rpx 0;
 }
