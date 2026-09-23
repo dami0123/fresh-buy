@@ -332,7 +332,9 @@ Page({
 
   /** 提交订单 */
   onSubmit() {
-    if (this.data.submitting) return
+    // submitted 是实例属性（不是 data 字段）：与 submitting 的区别在于
+    // submitting 在 complete 回调里会被复位，而订单一旦创建成功就不能再提交。
+    if (this.data.submitting || this.submitted) return
 
     if (!this.data.carts.length) {
       wx.showToast({ title: '没有待下单的商品', icon: 'none' })
@@ -383,8 +385,16 @@ Page({
           return
         }
 
+        // 订单已落库，上锁。complete 会把 submitting 复位，只靠它挡不住
+        // 「跳转前连点第二次」
+        this.submitted = true
+
         // 下单成功后清空已下单的条目（removeCart 的批量模式正是为此设计）
         this.clearOrderedCart(this.data.carts.map((item) => item._id).filter(Boolean))
+
+        // 同步清空页面上的商品清单：即便后面的跳转失败，本页也不会留着
+        // 一份还能再次提交的清单
+        this.setData({ carts: [], totalCount: 0, totalText: '0.00' })
 
         wx.showToast({ title: '下单成功', icon: 'success' })
 

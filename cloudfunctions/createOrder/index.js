@@ -74,7 +74,7 @@ function generateOrderNo() {
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-  const { items = [], address: rawAddress } = event
+  const { items = [], address: rawAddress } = event || {}
 
   // ---- 参数校验 ----
   if (!Array.isArray(items) || items.length === 0) {
@@ -98,6 +98,11 @@ exports.main = async (event) => {
     if (ids.length !== items.length) {
       return { code: -1, msg: '订单商品参数不完整' }
     }
+    // 同一商品在本单里出现多次，会被拆成多条 orderItems 且各自判库存，
+    // 合计数量可能超过实际库存。购物车已按 productId 合并，正常不会出现，直接拦下。
+    if (new Set(ids).size !== ids.length) {
+      return { code: -1, msg: '订单中存在重复商品，请返回购物车重新提交' }
+    }
 
     const productRes = await products.where({ _id: _.in(ids) }).get()
     const productMap = {}
@@ -120,8 +125,22 @@ exports.main = async (event) => {
         return { code: -1, msg: `「${product.name}」的购买数量不合法` }
       }
 
-      if (Number(product.stock) < count) {
-        return { code: -1, msg: `「${product.name}」库存不足，仅剩 ${product.stock} 件` }
+      // 三项服务端校验：下架 / 价格合法性 / 库存。
+      // 必须在 count 校验之后 —— 下面用到了 count，而它是本块内的 const。
+      if (Number(product.status) === 0) {
+        return { code: -1, msg: `【${product.name}】已下架` }
+      }
+
+      const price = Number(product.price)
+      if (!Number.isFinite(price) || price < 0) {
+        return { code: -1, msg: `【${product.name}】价格异常` }
+      }
+
+      // 缺 stock 字段时按 0 处理：原写法 Number(undefined) < count 恒为 false，
+      // 会让没有库存字段的商品蒙混过关（NaN 与任何数比较都是 false）。
+      const stock = Number(product.stock) || 0
+      if (stock < count) {
+        return { code: -1, msg: `【${product.name}】库存不足，仅剩 ${stock} 件` }
       }
 
       // 金额一律取服务端的 product.price，忽略前端传入的任何价格字段
@@ -156,8 +175,20 @@ exports.main = async (event) => {
 
     const addRes = await orders.add({ data: order })
 
-    // TODO: 库存扣减与订单写入应放入事务（db.startTransaction），保证并发下不超卖。
-    // 空壳阶段暂不扣减，接入商品发布流程后补全。
+    // TODO【第二梯队 · 本次迭代不实现】：库存扣减与订单写入应放入事务，保证并发下不超卖。
+    //
+    // 现存风险（两处，都属于并发问题，功能测试单人操作测不出来）：
+    //   1) 超卖：上面的库存校验只是「读校验」，与这里的订单写入是两步独立操作，
+    //      中间没有事务保护。两个用户同时下单同一件 stock=1 的商品时，双方都能读到
+    //      库存充足并通过校验，随后各自写入订单 —— 库存被超卖。
+    //      按 CLAUDE.md「库存扣减约定」，正确做法是 db.startTransaction() 内完成
+    //      「扣减 + 写单」，扣减用 _.inc(-count) 原子写（禁止先读后写回），
+    //      事务内重新校验库存，任一步失败整体回滚。
+    //   2) 重复商品拦截的边界：上面的 new Set(ids) 查重只能拦住「同一个订单内重复提交
+    //      同一商品」，拦不住「两个并发请求各下一单同一商品」—— 后者是跨请求的并发，
+    //      需靠上面的事务 + 原子扣减解决，查重逻辑本身无法覆盖。
+    //
+    // 空壳阶段暂不扣减，接入商品发布流程后随事务一起补全。
 
     return {
       code: 0,

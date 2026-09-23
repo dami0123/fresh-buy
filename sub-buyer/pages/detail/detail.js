@@ -72,29 +72,28 @@ Page({
 
   /**
    * 加入购物车
-   * TODO: 按 CLAUDE.md「所有写操作必须通过云函数」的约定，购物车需要补充云函数
-   * （建议命名 addToCart / updateCartCount / removeCart），部署后再在此处调用：
-   *   wx.cloud.callFunction({ name: 'addToCart', data: { productId, count } })
+   * 写操作必须走云函数（CLAUDE.md「前端开发规范」）。
+   * 云函数本身还有下架 / 售罄 / 超库存等分支，成功与否以 result.code 为准，
+   * 不能只看调用有没有 fail —— 业务失败也是 success 回调。
    */
   addCart() {
     wx.cloud.callFunction({
-      name: "addToCart",
+      name: 'addToCart',
       data: {
         productId: this.data.product._id,
         count: this.data.count
       },
-      success: res => {
-        wx.showToast({
-          title: "加入购物车成功"
-        })
-        console.log("addToCart返回", res)
+      success: (res) => {
+        const result = res.result || {}
+        if (result.code !== 0) {
+          wx.showToast({ title: result.msg || '加入购物车失败', icon: 'none' })
+          return
+        }
+        wx.showToast({ title: '加入购物车成功', icon: 'success' })
       },
-      fail: err => {
-        wx.showToast({
-          title: "加入购物车失败",
-          icon: "none"
-        })
-        console.error("调用云函数错误：", err)
+      fail: (err) => {
+        console.error('[FreshBuy] 加入购物车失败', err)
+        wx.showToast({ title: '加入购物车失败', icon: 'none' })
       }
     })
   },

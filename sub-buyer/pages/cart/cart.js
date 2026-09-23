@@ -66,12 +66,40 @@ Page({
   },
 
   /**
-   * 删除条目
-   * TODO: 按 CLAUDE.md「所有写操作必须通过云函数」的约定，需先补充 removeCart 云函数，示例：
-   *   wx.cloud.callFunction({ name: 'removeCart', data: { cartId } })
+   * 删除条目 —— 调 removeCart 云函数，成功后再重新拉取列表。
+   *
+   * 为什么不在本地先把这条从 carts 里 filter 掉：那样界面会「先成功、后失败」，
+   * 删库失败时用户以为已经删掉了，刷新一次条目又回来了。
+   * 写操作一律走云函数（CLAUDE.md「前端开发规范」），以云函数返回的 code 为准，
+   * 失败时把云函数的 msg 原样透出。
    */
   onRemove(e) {
-    wx.showToast({ title: '待接入 removeCart 云函数', icon: 'none' })
+    const cartId = e.currentTarget.dataset.id
+    if (!cartId) return
+
+    wx.showLoading({ title: '删除中…', mask: true })
+
+    wx.cloud.callFunction({
+      name: 'removeCart',
+      data: { cartId },
+      // hideLoading 写在回调里而不是 complete：showToast 与 showLoading 共用
+      // 同一层 UI，complete 里再 hideLoading 会把刚弹出来的提示一起关掉。
+      success: (res) => {
+        wx.hideLoading()
+
+        const result = res.result || {}
+        if (result.code !== 0) {
+          wx.showToast({ title: result.msg || '删除失败', icon: 'none' })
+          return
+        }
+        this.loadCart()
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('[FreshBuy] 删除购物车条目失败', err)
+        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
+      }
+    })
   },
 
   /**
