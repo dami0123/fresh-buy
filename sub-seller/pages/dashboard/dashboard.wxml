@@ -24,14 +24,31 @@
     </view>
   </view>
 
-  <!-- 快捷入口 -->
+  <!--
+    快捷入口：bindtap 挂在整行 .menu-item 上，行内两个 <text> 不各自绑定事件。
+    行内空白区能点中的关键在 .menu-label 的 flex: 1 —— 它把左侧文字节点撑满整行剩余宽度，
+    整行任意位置落在文字节点或行本身上，都会冒泡到这一行的 bindtap。
+  -->
   <view class="card menu">
-    <view class="menu-item" data-url="/sub-seller/pages/product-manage/product-manage" bindtap="onNavTap">
-      <text>商品管理</text>
+    <view
+      class="menu-item"
+      hover-class="menu-item-hover"
+      hover-stay-time="120"
+      data-url="/sub-seller/pages/product-manage/product-manage"
+      bindtap="onNavTap"
+    >
+      <text class="menu-label">商品管理</text>
       <text class="arrow">›</text>
     </view>
-    <view class="menu-item" data-url="/sub-seller/pages/order-manage/order-manage" bindtap="onNavTap">
-      <text>订单管理</text>
+
+    <view
+      class="menu-item"
+      hover-class="menu-item-hover"
+      hover-stay-time="120"
+      data-url="/sub-seller/pages/order-manage/order-manage"
+      bindtap="onNavTap"
+    >
+      <text class="menu-label">订单管理</text>
       <text class="arrow">›</text>
     </view>
   </view>

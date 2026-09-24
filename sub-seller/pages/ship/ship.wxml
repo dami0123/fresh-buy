@@ -1,4 +1,89 @@
-<!-- sub-seller/pages/ship/ship.wxml —— 发货拍照（空骨架，待同伴 B 填充） -->
+<!-- sub-seller/pages/ship/ship.wxml —— 发货拍照 -->
 <view class="page">
-  <view class="placeholder">发货拍照 · 待实现</view>
+
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="empty" wx:if="{{!loading && !order}}">{{error || '订单加载失败'}}</view>
+
+  <block wx:if="{{!loading && order}}">
+
+    <!-- 订单信息 -->
+    <view class="card">
+      <view class="order-head">
+        <text class="order-no">{{order.orderNo}}</text>
+        <text class="status-text">{{order.statusText}}</text>
+      </view>
+
+      <view class="order-item" wx:for="{{order.items}}" wx:for-item="goods" wx:key="productId">
+        <text class="goods-name">{{goods.name}}</text>
+        <text class="goods-count">×{{goods.count}}</text>
+      </view>
+
+      <view class="order-foot">
+        <text>共 {{order.count}} 件</text>
+        <text>合计 <text class="price">¥{{order.totalPriceText}}</text></text>
+      </view>
+
+      <view class="receiver" wx:if="{{order.addressText}}">
+        <view class="receiver-line">{{order.receiverName}} {{order.receiverPhone}}</view>
+        <view class="receiver-line">{{order.addressText}}</view>
+      </view>
+
+      <view class="order-time">下单时间：{{order.createTimeText}}</view>
+    </view>
+
+    <!-- 买家驳回原因 + 上一轮照片：商家据此重拍 -->
+    <view class="card" wx:if="{{order.shipRejectReason}}">
+      <view class="section-title reject-title">买家已驳回，请重新拍照</view>
+      <view class="reject-reason">{{order.shipRejectReason}}</view>
+
+      <view class="last-photos" wx:if="{{lastShipPhotos.length}}">
+        <image
+          class="last-photo"
+          wx:for="{{lastShipPhotos}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="aspectFill"
+        />
+      </view>
+    </view>
+
+    <!-- 不可发货时的说明 -->
+    <view class="card warn-card" wx:if="{{!canShip}}">{{error}}</view>
+
+    <!-- 拍照区 -->
+    <view class="card" wx:if="{{canShip}}">
+      <view class="section-title">
+        发货照片（需 {{photoCount}} 张，{{photos.length}}/{{photoCount}}）
+      </view>
+
+      <view class="photo-grid">
+        <view class="photo-item" wx:for="{{photos}}" wx:key="*this">
+          <image class="photo" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="onPreview" />
+          <view class="photo-remove" data-index="{{index}}" catchtap="onRemovePhoto">×</view>
+        </view>
+
+        <view
+          class="photo-add"
+          wx:if="{{photos.length < photoCount}}"
+          hover-class="photo-add-hover"
+          bindtap="onChoosePhoto"
+        >＋</view>
+      </view>
+
+      <view class="tip">
+        请把商品整体外观拍清楚，照片将用于后续售后责任判定，提交后买家可见
+      </view>
+    </view>
+
+    <button
+      class="btn-submit"
+      wx:if="{{canShip}}"
+      type="primary"
+      loading="{{submitting}}"
+      disabled="{{submitting || photos.length !== photoCount}}"
+      bindtap="onSubmit"
+    >提交发货照片</button>
+
+  </block>
+
 </view>

@@ -1,19 +1,37 @@
 <!-- sub-seller/pages/order-manage/order-manage.wxml -->
 <view class="page">
 
-  <!-- 状态筛选 -->
-  <view class="tabs">
+  <!-- 状态筛选：tab 数量多，横向滚动，避免挤成一团看不清 -->
+  <scroll-view class="tabs" scroll-x scroll-with-animation>
     <view
       wx:for="{{tabs}}"
-      wx:key="name"
-      class="tab {{activeStatus === item.status ? 'active' : ''}}"
-      data-status="{{item.status}}"
+      wx:key="key"
+      class="tab {{activeKey === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
       bindtap="onTabTap"
     >{{item.name}}</view>
-  </view>
+  </scroll-view>
 
-  <!-- 订单列表 -->
-  <view class="card order" wx:for="{{orders}}" wx:key="_id">
+  <!--
+    订单列表。整张卡片可点，四种状态（1 待发货 / 2 待确认发货 / 3 配送中 / 4 已完成）
+    以及售后 tab 下的订单一视同仁，点击都打开详情弹层。
+
+    为什么是页面内弹层而不是跳转详情页：
+      1. app.json 属禁止区（CLAUDE.md「团队协作约定」），商家端分包内没有注册
+         订单详情页，当前角色无法新增；
+      2. 买家端 /sub-buyer/pages/order-detail 也复用了不了 —— 它走 getMyOrders，
+         该函数在 userId !== OPENID 时返回 code -2（getMyOrders/index.js），
+         商家永远不是订单归属人，打开只会看到「无权查看该订单」。
+    因此详情改用 getSellerOrders 的单条模式（云函数内校验 role === 'seller'），
+    在页面内以弹层呈现，与 ship 发货页取数方式一致。
+  -->
+  <view
+    class="card order"
+    wx:for="{{orders}}"
+    wx:key="_id"
+    data-id="{{item._id}}"
+    bindtap="onCardTap"
+  >
     <view class="order-head">
       <text class="order-no">{{item.orderNo}}</text>
       <text class="status status-{{item.statusTheme}}">{{item.statusText}}</text>
@@ -31,8 +49,48 @@
       <text class="order-total">共 {{item.count}} 件 合计 <text class="price">¥{{item.totalPriceText}}</text></text>
     </view>
 
+    <!-- 买家驳回发货照片时，把原因摆出来，商家才知道要重拍 -->
+    <view class="reject-tip" wx:if="{{item.shipRejectReason}}">驳回原因：{{item.shipRejectReason}}</view>
+
+    <!-- 售后信息：只读展示，商家不能改判（CLAUDE.md「售后判定约定」） -->
+    <view class="aftersale" wx:if="{{item.aftersale}}">
+      <view class="aftersale-title">售后信息</view>
+
+      <view class="aftersale-row">
+        <text class="aftersale-label">责任判定</text>
+        <text class="aftersale-value liable-{{item.aftersale.liableTheme}}">{{item.aftersale.liableText}}</text>
+      </view>
+
+      <view class="aftersale-row" wx:if="{{item.aftersale.reason}}">
+        <text class="aftersale-label">判定理由</text>
+        <text class="aftersale-value">{{item.aftersale.reason}}</text>
+      </view>
+
+      <view class="aftersale-row">
+        <text class="aftersale-label">处理结果</text>
+        <text class="aftersale-value">{{item.aftersale.resolutionText}}</text>
+      </view>
+
+      <view class="aftersale-row" wx:if="{{item.aftersale.applyTimeText}}">
+        <text class="aftersale-label">申请时间</text>
+        <text class="aftersale-value">{{item.aftersale.applyTimeText}}</text>
+      </view>
+
+      <view class="aftersale-row" wx:if="{{item.aftersale.reshipCount}}">
+        <text class="aftersale-label">重发次数</text>
+        <text class="aftersale-value">{{item.aftersale.reshipCount}}</text>
+      </view>
+    </view>
+
+    <!-- 显示条件（canShip）未改动：仍只由 status=1，或 status=2 且买家已驳回决定 -->
     <view class="order-ops" wx:if="{{item.canShip}}">
-      <button class="btn btn-primary" data-id="{{item._id}}" bindtap="onShip" disabled="{{shipping}}">发货</button>
+      <!--
+        必须用 catchtap 而不是 bindtap：卡片本身已绑定 onCardTap，
+        bindtap 会冒泡上去，点「发货」会连着弹出详情弹层。
+      -->
+      <view class="btn-ship" hover-class="btn-ship-hover" data-id="{{item._id}}" catchtap="onShip">
+        {{item.shipBtnText}}
+      </view>
     </view>
   </view>
 
@@ -40,5 +98,147 @@
   <view class="empty" wx:if="{{!loading && orders.length === 0}}">{{error || '暂无订单'}}</view>
   <view class="loading" wx:if="{{loading}}">加载中…</view>
   <view class="loading" wx:elif="{{!hasMore && orders.length > 0}}">没有更多了</view>
+
+  <!--
+    订单详情弹层。
+    样式全部写成行内 style：本次改动限定只动 wxml/js，不能改 order-manage.wxss，
+    故不新增类名，只在能复用处复用页面已有类（order-head / order-item / aftersale 等）。
+  -->
+  <view
+    wx:if="{{detailVisible}}"
+    class="detail-mask"
+    bindtap="onCloseDetail"
+    catchtouchmove="noop"
+    style="position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;"
+  >
+    <view
+      catchtap="noop"
+      style="position:absolute;left:0;right:0;bottom:0;height:80vh;background:#fff;border-radius:24rpx 24rpx 0 0;display:flex;flex-direction:column;"
+    >
+      <!-- 弹层头部 -->
+      <view style="display:flex;justify-content:space-between;align-items:center;padding:28rpx 32rpx;border-bottom:2rpx solid #f2f2f2;flex-shrink:0;">
+        <text style="font-size:32rpx;font-weight:600;color:#333;">订单详情</text>
+        <text bindtap="onCloseDetail" style="font-size:40rpx;line-height:1;color:#999;padding:0 8rpx;">×</text>
+      </view>
+
+      <!-- flex:1 + height:0 让 scroll-view 撑满剩余高度，否则它不滚动 -->
+      <scroll-view scroll-y style="flex:1;height:0;">
+        <view style="padding:24rpx 32rpx 60rpx;box-sizing:border-box;">
+
+          <view wx:if="{{detailLoading}}" style="padding:80rpx 0;text-align:center;color:#999;font-size:26rpx;">加载中…</view>
+
+          <view wx:elif="{{detailError}}" style="padding:80rpx 0;text-align:center;color:#999;font-size:26rpx;">{{detailError}}</view>
+
+          <block wx:elif="{{detail}}">
+
+            <!-- 订单号 / 状态 -->
+            <view class="order-head">
+              <text class="order-no">{{detail.orderNo}}</text>
+              <text class="status status-{{detail.statusTheme}}">{{detail.statusText}}</text>
+            </view>
+
+            <!-- 收货地址：下单时写入的快照，非 users 引用（CLAUDE.md「地址快照原则」） -->
+            <view style="margin-top:24rpx;padding:20rpx;border-radius:12rpx;background:#fafafa;">
+              <view style="font-size:24rpx;color:#999;margin-bottom:8rpx;">收货地址</view>
+              <view style="font-size:26rpx;color:#333;line-height:1.6;">{{detail.receiverName}} {{detail.receiverPhone}}</view>
+              <view style="font-size:26rpx;color:#333;line-height:1.6;">{{detail.addressText || '—'}}</view>
+            </view>
+
+            <!-- 商品明细 -->
+            <view style="margin-top:24rpx;padding:20rpx;border-radius:12rpx;background:#fafafa;">
+              <view style="font-size:24rpx;color:#999;margin-bottom:8rpx;">商品明细</view>
+
+              <view class="order-item" wx:for="{{detail.items}}" wx:for-item="goods" wx:key="productId">
+                <text class="goods-name">{{goods.name}}</text>
+                <text class="goods-count">¥{{goods.priceText}} ×{{goods.count}} = ¥{{goods.subtotalText}}</text>
+              </view>
+
+              <view class="order-foot" style="margin-top:12rpx;">
+                <text>共 {{detail.count}} 件</text>
+                <text>合计 <text class="price">¥{{detail.totalPriceText}}</text></text>
+              </view>
+            </view>
+
+            <!-- 发货照片：状态 2/3/4 进来就是看这个（本次需求的重点） -->
+            <view style="margin-top:24rpx;padding:20rpx;border-radius:12rpx;background:#fafafa;">
+              <view style="font-size:24rpx;color:#999;margin-bottom:8rpx;">发货照片</view>
+
+              <view wx:if="{{detail.shipPhotos.length}}" style="display:flex;flex-wrap:wrap;">
+                <image
+                  wx:for="{{detail.shipPhotos}}"
+                  wx:key="*this"
+                  src="{{item}}"
+                  mode="aspectFill"
+                  data-src="{{item}}"
+                  bindtap="onPreviewPhoto"
+                  style="width:180rpx;height:180rpx;margin:0 12rpx 12rpx 0;border-radius:8rpx;background:#eee;"
+                />
+              </view>
+
+              <view wx:else style="font-size:24rpx;color:#bbb;">商家尚未上传发货照片</view>
+            </view>
+
+            <!-- 买家退货照片：只有发起过售后才有 -->
+            <view wx:if="{{detail.returnPhotos.length}}" style="margin-top:24rpx;padding:20rpx;border-radius:12rpx;background:#fafafa;">
+              <view style="font-size:24rpx;color:#999;margin-bottom:8rpx;">买家退货照片</view>
+
+              <view style="display:flex;flex-wrap:wrap;">
+                <image
+                  wx:for="{{detail.returnPhotos}}"
+                  wx:key="*this"
+                  src="{{item}}"
+                  mode="aspectFill"
+                  data-src="{{item}}"
+                  bindtap="onPreviewPhoto"
+                  style="width:180rpx;height:180rpx;margin:0 12rpx 12rpx 0;border-radius:8rpx;background:#eee;"
+                />
+              </view>
+            </view>
+
+            <!-- 买家驳回发货照片的原因 -->
+            <view class="reject-tip" wx:if="{{detail.shipRejectReason}}">驳回原因：{{detail.shipRejectReason}}</view>
+
+            <!-- 售后信息：与卡片同一套只读块，商家不能改判（CLAUDE.md「售后判定约定」） -->
+            <view class="aftersale" wx:if="{{detail.aftersale}}">
+              <view class="aftersale-title">售后信息</view>
+
+              <view class="aftersale-row">
+                <text class="aftersale-label">责任判定</text>
+                <text class="aftersale-value liable-{{detail.aftersale.liableTheme}}">{{detail.aftersale.liableText}}</text>
+              </view>
+
+              <view class="aftersale-row" wx:if="{{detail.aftersale.reason}}">
+                <text class="aftersale-label">判定理由</text>
+                <text class="aftersale-value">{{detail.aftersale.reason}}</text>
+              </view>
+
+              <view class="aftersale-row">
+                <text class="aftersale-label">处理结果</text>
+                <text class="aftersale-value">{{detail.aftersale.resolutionText}}</text>
+              </view>
+
+              <view class="aftersale-row" wx:if="{{detail.aftersale.applyTimeText}}">
+                <text class="aftersale-label">申请时间</text>
+                <text class="aftersale-value">{{detail.aftersale.applyTimeText}}</text>
+              </view>
+
+              <view class="aftersale-row" wx:if="{{detail.aftersale.reshipCount}}">
+                <text class="aftersale-label">重发次数</text>
+                <text class="aftersale-value">{{detail.aftersale.reshipCount}}</text>
+              </view>
+            </view>
+
+            <!-- 时间 -->
+            <view style="margin-top:24rpx;font-size:24rpx;color:#999;line-height:1.8;">
+              <view>下单时间：{{detail.createTimeText}}</view>
+              <view wx:if="{{detail.updateTimeText}}">最后更新：{{detail.updateTimeText}}</view>
+            </view>
+
+          </block>
+
+        </view>
+      </scroll-view>
+    </view>
+  </view>
 
 </view>

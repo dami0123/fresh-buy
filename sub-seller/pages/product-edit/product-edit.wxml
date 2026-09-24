@@ -1,4 +1,105 @@
-<!-- sub-seller/pages/product-edit/product-edit.wxml —— 商品编辑（空骨架，待同伴 B 填充） -->
+<!-- sub-seller/pages/product-edit/product-edit.wxml —— 商品新增 / 编辑 -->
 <view class="page">
-  <view class="placeholder">商品编辑 · 待实现</view>
+
+  <view class="loading" wx:if="{{loading}}">加载中…</view>
+  <view class="empty" wx:if="{{error}}">{{error}}</view>
+
+  <block wx:if="{{!loading && !error}}">
+
+    <!-- 基本信息 -->
+    <view class="card">
+      <view class="field">
+        <text class="label">商品名称</text>
+        <input
+          class="input"
+          value="{{name}}"
+          maxlength="{{nameMaxLen}}"
+          placeholder="如：本地小番茄"
+          placeholder-class="ph"
+          bindinput="onNameInput"
+        />
+      </view>
+
+      <view class="field">
+        <text class="label">价格（元）</text>
+        <input
+          class="input"
+          type="digit"
+          value="{{price}}"
+          placeholder="0.00"
+          placeholder-class="ph"
+          bindinput="onPriceInput"
+        />
+      </view>
+
+      <view class="field">
+        <text class="label">库存（件）</text>
+        <input
+          class="input"
+          type="number"
+          value="{{stock}}"
+          placeholder="0"
+          placeholder-class="ph"
+          bindinput="onStockInput"
+        />
+      </view>
+
+      <view class="field">
+        <text class="label">分类</text>
+        <picker
+          class="picker"
+          mode="selector"
+          range="{{categoryNames}}"
+          value="{{categoryIndex}}"
+          bindchange="onCategoryChange"
+        >
+          <view class="picker-value {{category ? '' : 'ph'}}">{{categoryText}}</view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label">上架销售</text>
+        <switch checked="{{status === 1}}" color="#07c160" bindchange="onStatusChange" />
+      </view>
+    </view>
+
+    <!-- 商品图片 -->
+    <view class="card">
+      <view class="section-title">商品图片（第一张作为封面，最多 {{maxImages}} 张）</view>
+
+      <view class="image-grid">
+        <view class="image-item" wx:for="{{images}}" wx:key="id">
+          <image
+            class="image"
+            src="{{item.src}}"
+            mode="aspectFill"
+            data-index="{{index}}"
+            bindtap="onPreviewImage"
+          />
+          <!-- catchtap：删除不要冒泡到上面的预览 -->
+          <view class="image-remove" data-index="{{index}}" catchtap="onRemoveImage">×</view>
+          <view class="image-cover-tag" wx:if="{{index === 0}}">封面</view>
+        </view>
+
+        <view
+          class="image-add"
+          wx:if="{{images.length < maxImages}}"
+          hover-class="image-add-hover"
+          bindtap="onChooseImage"
+        >＋</view>
+      </view>
+    </view>
+
+    <view class="tip">价格、库存由云函数二次校验；提交后返回商品管理页</view>
+
+    <button
+      class="btn-submit"
+      type="primary"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+      bindtap="onSubmit"
+    >{{mode === 'edit' ? '保存修改' : '创建商品'}}</button>
+
+  </block>
+
 </view>

@@ -1,11 +1,185 @@
 /* sub-seller/pages/ship/ship.wxss */
 .page {
-  padding: 24rpx;
+  padding: 24rpx 24rpx 60rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
-  color: #999;
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f2f2f2;
+}
+
+.order-no {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.status-text {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 151, 106, 0.12);
+  color: #ff976a;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
   font-size: 28rpx;
+  line-height: 1.8;
+  padding-top: 16rpx;
+}
+
+.goods-name {
+  flex: 1;
+  color: #333;
+}
+
+.goods-count {
+  color: #999;
+  margin-left: 20rpx;
+}
+
+.order-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26rpx;
+  color: #666;
+  padding-top: 16rpx;
+  margin-top: 8rpx;
+  border-top: 2rpx solid #f2f2f2;
+}
+
+.receiver {
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: #fafafa;
+}
+
+.receiver-line {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.7;
+}
+
+.order-time {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 驳回提示 */
+.section-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.reject-title {
+  color: #e64340;
+  font-weight: 600;
+}
+
+.reject-reason {
+  font-size: 26rpx;
+  color: #e64340;
+  line-height: 1.6;
+}
+
+.last-photos {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+
+.last-photo {
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 20rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+}
+
+/* 状态不允许发货时的说明卡片 */
+.warn-card {
+  font-size: 26rpx;
+  color: #ff976a;
+  line-height: 1.6;
+}
+
+/* 拍照九宫格 */
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.photo-item {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+}
+
+.photo-remove {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.photo-add {
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx dashed #ddd;
+  border-radius: 12rpx;
+  color: #ccc;
+  font-size: 60rpx;
+  line-height: 196rpx;
+  text-align: center;
+}
+
+.photo-add-hover {
+  background: #f7f7f7;
+}
+
+.tip {
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+.btn-submit {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  margin-top: 8rpx;
+  background: #07c160;
+  color: #fff;
+}
+
+.btn-submit[disabled] {
+  background: #c8e6d3;
+  color: #fff;
 }

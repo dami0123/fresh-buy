@@ -49,6 +49,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   height: 100rpx;
   font-size: 30rpx;
   border-bottom: 2rpx solid #f2f2f2;
@@ -56,6 +57,21 @@
 
 .menu-item:last-child {
   border-bottom: none;
+}
+
+/*
+  整行可点击的关键：
+  flex: 1 让左侧文字节点占满行内剩余宽度（行高由 line-height 撑满），
+  原先 <text> 只有文字那么宽，行内空白区落在行容器上，点击容易点不中。
+*/
+.menu-label {
+  flex: 1;
+  line-height: 100rpx;
+}
+
+/* 按住反馈：让「这一行被点到了」有可见的即时响应，便于自测点击区域 */
+.menu-item-hover {
+  background: #f2f2f2;
 }
 
 .arrow {

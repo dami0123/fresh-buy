@@ -1,11 +1,128 @@
 /* sub-seller/pages/product-edit/product-edit.wxss */
 .page {
-  padding: 24rpx;
+  padding: 24rpx 24rpx 60rpx;
 }
 
-.placeholder {
-  padding: 120rpx 0;
-  text-align: center;
-  color: #999;
+/* 表单行：左标签右输入，标签宽度固定，右侧对齐 */
+.field {
+  display: flex;
+  align-items: center;
+  min-height: 96rpx;
+  border-bottom: 2rpx solid #f2f2f2;
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.label {
+  width: 180rpx;
+  flex-shrink: 0;
   font-size: 28rpx;
+  color: #666;
+}
+
+.input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker {
+  flex: 1;
+}
+
+.picker-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 占位文案与 placeholder-class 共用一套灰 */
+.ph {
+  color: #bbb;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+/* 图片九宫格 */
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.image-item {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+}
+
+.image-remove {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.image-cover-tag {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 4rpx 12rpx;
+  border-radius: 0 12rpx 0 12rpx;
+  background: rgba(7, 193, 96, 0.85);
+  color: #fff;
+  font-size: 20rpx;
+}
+
+.image-add {
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx dashed #ddd;
+  border-radius: 12rpx;
+  color: #ccc;
+  font-size: 60rpx;
+  line-height: 196rpx;
+  text-align: center;
+}
+
+.image-add-hover {
+  background: #f7f7f7;
+}
+
+.tip {
+  padding: 8rpx 0 24rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.btn-submit {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  background: #07c160;
+  color: #fff;
 }

@@ -1,6 +1,12 @@
 <!-- sub-seller/pages/product-manage/product-manage.wxml -->
 <view class="page">
 
+  <!-- 新增入口：放在列表上方，不必滚到底也能点到 -->
+  <view class="toolbar">
+    <text class="toolbar-title">商品列表</text>
+    <view class="btn-add" hover-class="btn-add-hover" bindtap="onCreate">＋ 新增商品</view>
+  </view>
+
   <view class="product-item card" wx:for="{{products}}" wx:key="_id">
     <image class="cover" src="{{item.cover}}" mode="aspectFill" lazy-load />
 
@@ -13,6 +19,7 @@
       </view>
 
       <view class="ops">
+        <view class="op" data-id="{{item._id}}" bindtap="onEdit">编辑</view>
         <view class="op" data-id="{{item._id}}" bindtap="onEditStock">改库存</view>
         <view class="op primary" data-id="{{item._id}}" bindtap="onToggleSale">
           {{item.onSale ? '下架' : '上架'}}
@@ -25,8 +32,5 @@
   <view class="empty" wx:if="{{!loading && products.length === 0}}">{{error || '暂无商品'}}</view>
   <view class="loading" wx:if="{{loading}}">加载中…</view>
   <view class="loading" wx:elif="{{!hasMore && products.length > 0}}">没有更多了</view>
-
-  <!-- 新增入口 -->
-  <view class="fab" bindtap="onCreate">＋</view>
 
 </view>

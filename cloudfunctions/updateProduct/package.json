@@ -1,0 +1,9 @@
+{
+  "name": "updateProduct",
+  "version": "1.0.0",
+  "description": "FreshBuy 商家更新商品云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

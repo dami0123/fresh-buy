@@ -54,10 +54,22 @@ Page({
       })
   },
 
-  /** 快捷入口跳转 */
+  /**
+   * 快捷入口跳转（bindtap 挂在整行 .menu-item 上，行内任意位置都能触发）
+   * fail 里必须给提示：否则路由出错（页面路径写错、分包未注册）时点了毫无反应，
+   * 只会被当成「点击区域没做对」。
+   */
   onNavTap(e) {
     const { url } = e.currentTarget.dataset
-    wx.navigateTo({ url })
+    if (!url) return
+
+    wx.navigateTo({
+      url,
+      fail: (err) => {
+        console.error('[FreshBuy] 页面跳转失败', url, err)
+        wx.showToast({ title: '页面打开失败', icon: 'none' })
+      }
+    })
   },
 
   /** 退出到身份选择页 */
