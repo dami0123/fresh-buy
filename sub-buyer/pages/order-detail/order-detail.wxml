@@ -32,6 +32,17 @@
       </view>
     </view>
 
+    <!-- ==================== 系统判责结果 ====================
+         订单停在「售后中」说明系统已判定为商家责任，接下来该买家在退款 / 补发商品之间二选一
+         （按钮在底部操作栏）。把结论与理由展示出来，买家才知道那两个按钮因何出现。
+         判定为非商家责任的情形由上方 reject-banner 承载，两者互斥（liable 只有真假两态）。 -->
+    <view class="card judge-card" wx:if="{{order.showJudgeCard}}">
+      <view class="card-title">系统判责结果</view>
+      <view class="judge-badge liable-yes">判定为商家责任</view>
+      <view class="judge-reason" wx:if="{{order.liableReason}}">{{order.liableReason}}</view>
+      <view class="hint">判定由系统自动完成，结论为终局判定。请选择处理方式，提交后不可更改。</view>
+    </view>
+
     <!-- ==================== 收货地址（下单时的快照） ==================== -->
     <view class="card">
       <view class="card-title">收货地址</view>
@@ -39,20 +50,52 @@
       <view class="addr-text">{{order.addressText}}</view>
     </view>
 
-    <!-- ==================== 商家发货照片 ==================== -->
-    <view class="card" wx:if="{{order.shipPhotos.length > 0}}">
+    <!-- ==================== 商家发货照片（补发单有多轮）====================
+         商家发过好几轮时，两块数据都要渲染，缺一不可：
+           shipPhotos   —— 最近一轮。shipOrder 每次提交都用新照片整体覆盖它
+           shipHistory  —— 更早的每一轮。shipOrder 在覆盖前把旧的一轮归档进来
+         「本次」排在最前：买家最需要确认的是这次发的是什么；历史轮次由新到旧跟在后面，
+         便于看出同一问题是否重复出现。
+         轮次标签只在发过两轮以上时出现，单轮保持原来的极简样子。 -->
+    <view class="card" wx:if="{{order.shipPhotos.length > 0 || order.shipHistory.length > 0}}">
       <view class="card-title">商家发货照片</view>
-      <view class="photo-grid">
-        <image
-          class="photo"
-          wx:for="{{order.shipPhotos}}"
-          wx:key="*this"
-          src="{{item}}"
-          mode="aspectFill"
-          data-src="{{item}}"
-          bindtap="onPreview"
-        />
-      </view>
+
+      <block wx:if="{{order.shipPhotos.length > 0}}">
+        <view class="hint" wx:if="{{order.shipMultiRound}}">
+          本次发货（第 {{order.shipCurrentRound}} 轮 / 共 {{order.shipRoundTotal}} 轮）
+        </view>
+        <view class="photo-grid">
+          <image
+            class="photo"
+            wx:for="{{order.shipPhotos}}"
+            wx:key="*this"
+            src="{{item}}"
+            mode="aspectFill"
+            data-src="{{item}}"
+            bindtap="onPreview"
+          />
+        </view>
+      </block>
+
+      <!-- 历史轮次：js 已按由新到旧排好 -->
+      <block wx:for="{{order.shipHistory}}" wx:for-item="round" wx:key="round">
+        <view class="hint">
+          第 {{round.round}} 轮发货（{{round.photos.length}} 张）
+          <block wx:if="{{round.archivedAtText}}">· 归档于 {{round.archivedAtText}}</block>
+        </view>
+        <view class="photo-grid">
+          <image
+            class="photo"
+            wx:for="{{round.photos}}"
+            wx:key="*this"
+            src="{{item}}"
+            mode="aspectFill"
+            data-src="{{item}}"
+            bindtap="onPreview"
+          />
+        </view>
+      </block>
+
       <view class="hint" wx:if="{{order.shipRejectReason}}">
         上次驳回原因：{{order.shipRejectReason}}
       </view>
@@ -144,10 +187,25 @@
         bindtap="onApplyReturn"
       >申请退货</button>
 
-      <!-- 5 售后中：去处理（选退款或重发货） -->
+      <!-- 5 售后中 + 判定为商家责任：买家二选一，售后到此收尾（调 resolveReturn）
+           退款会关单（终态），补发会让订单回到待发货、商家重新发货，两者都不可逆 -->
       <button
         class="btn btn-primary btn-sm"
-        wx:if="{{order.isAfterSale}}"
+        wx:if="{{order.canResolveReturn}}"
+        bindtap="onRefund"
+        disabled="{{submitting}}"
+      >申请退款</button>
+      <button
+        class="btn btn-plain btn-sm"
+        wx:if="{{order.canResolveReturn}}"
+        bindtap="onReship"
+        disabled="{{submitting}}"
+      >补发商品</button>
+
+      <!-- 5 售后中但没拿到商家责任结论：异常数据的兜底入口，正常流程不会出现 -->
+      <button
+        class="btn btn-primary btn-sm"
+        wx:if="{{order.isAfterSale && !order.canResolveReturn}}"
         bindtap="onHandleReturn"
       >处理售后</button>
     </view>
